@@ -1,0 +1,31 @@
+# Systemd service file for synthr (alternative to PM2)
+# Place this at: /etc/systemd/system/synthr.service
+# Then: sudo systemctl daemon-reload && sudo systemctl enable --now synthr
+
+[Unit]
+Description=synthr - Personal Finance Tracker
+Documentation=https://github.com/yourusername/synthr
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/synthr
+ExecStart=/usr/bin/node /var/www/synthr/.next/standalone/server.js
+Restart=on-failure
+RestartSec=10
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+# Load environment variables from .env file
+EnvironmentFile=/var/www/synthr/.env
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/synthr
+
+[Install]
+WantedBy=multi-user.target

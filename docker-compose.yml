@@ -1,0 +1,52 @@
+# Docker Compose for synthr
+# Use this for local development or if you prefer Docker over PM2 on the VPS
+# For the 1GB RAM IONOS VPS, PM2 + native PostgreSQL is recommended (lighter than Docker)
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: synthr-db
+    restart: unless-stopped
+    # Memory limit for 1GB VPS
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      POSTGRES_USER: synthr
+      POSTGRES_PASSWORD: synthr_secret
+      POSTGRES_DB: synthr
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U synthr -d synthr"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: synthr-app
+    restart: unless-stopped
+    # Memory limit for 1GB VPS
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      DATABASE_URL: postgresql://synthr:synthr_secret@db:5432/synthr?schema=public
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: change-me-in-production
+      NODE_OPTIONS: "--max-old-space-size=384"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./prisma:/app/prisma
+
+volumes:
+  postgres_data:

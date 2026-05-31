@@ -1,0 +1,274 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  passwordHash  String?
+  setupComplete Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  accounts           Account[]
+  categories         Category[]
+  tags               Tag[]
+  transactions       Transaction[]
+  recurringRules     RecurringRule[]
+  budgets            Budget[]
+  investmentHoldings InvestmentHolding[]
+  notifications      Notification[]
+  savingsGoals       SavingsGoal[]
+  debts              Debt[]
+  savingsAdvisor     SavingsAdvisor?
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  CREDIT
+  CASH
+  INVESTMENT
+  LOAN
+}
+
+model Account {
+  id        String      @id @default(cuid())
+  name      String
+  type      AccountType
+  balance   Decimal     @db.Decimal(15, 2)
+  isDefault Boolean     @default(false)
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  transactions       Transaction[]
+  investmentHoldings InvestmentHolding[]
+
+  @@index([userId])
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+model Category {
+  id       String       @id @default(cuid())
+  name     String
+  type     CategoryType
+  color    String?
+  icon     String?
+  parentId String?
+  userId   String
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@index([userId])
+}
+
+model Tag {
+  id       String @id @default(cuid())
+  name     String
+  color    String?
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  transactions TransactionTag[]
+
+  @@index([userId])
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum TransactionSource {
+  MANUAL
+  CSV_IMPORT
+  RECURRING
+}
+
+model Transaction {
+  id          String            @id @default(cuid())
+  type        TransactionType
+  amount      Decimal           @db.Decimal(15, 2)
+  date        DateTime
+  description String
+  notes       String?
+  source      TransactionSource @default(MANUAL)
+  isRecurring Boolean           @default(false)
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  toAccountId String?
+  categoryId  String?
+  category    Category?         @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  tags         TransactionTag[]
+  recurringRule RecurringRule?  @relation(fields: [recurringRuleId], references: [id])
+  recurringRuleId String?
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([date])
+}
+
+model TransactionTag {
+  transactionId String
+  tagId         String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  tag           Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([transactionId, tagId])
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  YEARLY
+}
+
+model RecurringRule {
+  id          String        @id @default(cuid())
+  name        String
+  type        TransactionType
+  amount      Decimal       @db.Decimal(15, 2)
+  description String?
+  frequency   Frequency
+  startDate   DateTime
+  endDate     DateTime?
+  nextRun     DateTime
+  isActive    Boolean       @default(true)
+  accountId   String
+  toAccountId String?
+  categoryId  String?
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Budget {
+  id         String    @id @default(cuid())
+  amount     Decimal   @db.Decimal(15, 2)
+  period     String    // YYYY-MM
+  rollover   Boolean   @default(false)
+  categoryId String
+  category   Category  @relation(fields: [categoryId], references: [id])
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([categoryId, period])
+  @@index([userId])
+}
+
+enum NotificationType {
+  BUDGET_ALERT
+  RECURRING_CREATED
+  SAVINGS_MILESTONE
+  DEBT_PAYOFF_MILESTONE
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model SavingsGoal {
+  id            String    @id @default(cuid())
+  name          String
+  targetAmount  Decimal   @db.Decimal(15, 2)
+  currentAmount Decimal   @db.Decimal(15, 2) @default(0)
+  deadline      DateTime?
+  priority      Int       @default(1)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+enum PayoffStrategy {
+  AVALANCHE
+  SNOWBALL
+}
+
+model Debt {
+  id             String         @id @default(cuid())
+  name           String
+  type           String         // credit_card, student_loan, car_loan, etc.
+  balance        Decimal        @db.Decimal(15, 2)
+  apr            Decimal        @db.Decimal(5, 2)
+  minimumPayment Decimal        @db.Decimal(15, 2)
+  payoffStrategy PayoffStrategy @default(AVALANCHE)
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([userId])
+}
+
+model SavingsAdvisor {
+  id              String     @id @default(cuid())
+  userId          String     @unique
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  incomeFrequency Frequency  @default(MONTHLY)
+  targetRate      Decimal    @db.Decimal(5, 2) @default(0.20)
+  fixedExpenses   Decimal    @db.Decimal(15, 2) @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model InvestmentHolding {
+  id        String   @id @default(cuid())
+  symbol    String
+  quantity  Decimal  @db.Decimal(15, 4)
+  avgCost   Decimal  @db.Decimal(15, 2)
+  lastPrice Decimal? @db.Decimal(15, 2)
+  lastPriceAt DateTime?
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+}

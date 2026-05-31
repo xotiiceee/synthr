@@ -1,0 +1,17 @@
+Γû▓ Next.js 16.2.6 (Turbopack)
+- Environments: .env
+
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 7.8s
+  Running TypeScript ...
+  Finished TypeScript in 6.5s ...
+  Collecting page data using 11 workers ...
+TypeError: Cannot read properties of undefined (reading 'GET')
+    at <unknown> (C:\Users\User\Music\F tracker\.next\server\chunks\_00~q8i7._.js:34:47633)
+
+> Build error occurred
+Error: Failed to collect page data for /api/budgets/[id]
+    at ignore-listed frames {
+  type: 'Error'
+}
