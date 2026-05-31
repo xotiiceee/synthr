@@ -66,9 +66,13 @@ export async function POST(req: NextRequest) {
         data: defaultCategories.map((c) => ({ ...c, userId })),
       });
 
-      // Create savings advisor config
-      await tx.savingsAdvisor.create({
-        data: {
+      // Create or update savings advisor config
+      await tx.savingsAdvisor.upsert({
+        where: { userId },
+        update: {
+          incomeFrequency: data.incomeFrequency,
+        },
+        create: {
           userId,
           incomeFrequency: data.incomeFrequency,
           targetRate: 0.2,
