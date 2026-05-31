@@ -1,7 +1,11 @@
 import { compare, hash } from "bcryptjs";
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
+
+export async function auth() {
+  return getServerSession(authOptions);
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
