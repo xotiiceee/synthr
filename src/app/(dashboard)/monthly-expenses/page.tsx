@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,7 +31,9 @@ function getMonthLabel(date: Date) { return format(date, "MMMM yyyy"); }
 function getMonthParam(date: Date) { return format(date, "yyyy-MM"); }
 
 export default function MonthlyExpensesPage() {
+  const [mounted, setMounted] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  useEffect(() => { setMounted(true); }, []);
   const [showAdd, setShowAdd] = useState(false);
   const queryClient = useQueryClient();
 
@@ -205,16 +208,16 @@ export default function MonthlyExpensesPage() {
             </Card>
           </div>
 
-          {/* Simple Modal — no @base-ui/react dependency */}
-          {showAdd && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Portal Modal — renders to document.body, never hidden by layout */}
+          {mounted && showAdd && createPortal(
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center">
               <div className="fixed inset-0 bg-black/60" onClick={() => setShowAdd(false)} />
-              <div className="relative z-50 w-full max-w-md mx-4 bg-zinc-900 border border-white/10 rounded-xl p-6 shadow-2xl">
+              <div className="relative w-full max-w-md mx-4 bg-zinc-900 border border-white/10 rounded-xl p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold">Add Recurring Bill</h2>
-                  <Button variant="ghost" size="icon" onClick={() => setShowAdd(false)} className="h-8 w-8">
+                  <button onClick={() => setShowAdd(false)} className="p-1 rounded-lg hover:bg-white/5 transition-colors">
                     <X className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </div>
                 <form onSubmit={handleSubmit((d) => addBill.mutate(d))} className="space-y-4">
                   <div className="space-y-2">
@@ -260,12 +263,13 @@ export default function MonthlyExpensesPage() {
                     </div>
                   </div>
                   <div className="flex justify-end gap-2 pt-2">
-                    <Button type="button" variant="ghost" onClick={() => setShowAdd(false)}>Cancel</Button>
-                    <Button type="submit" className="bg-[#00d4aa] text-black font-semibold">Add Bill</Button>
+                    <button type="button" onClick={() => setShowAdd(false)} className="inline-flex items-center justify-center rounded-lg text-sm font-medium h-9 px-4 hover:bg-white/5 transition-colors">Cancel</button>
+                    <button type="submit" className="inline-flex items-center justify-center rounded-lg bg-[#00d4aa] text-black font-semibold h-9 px-4 hover:shadow-[0_0_20px_rgba(0,212,170,0.15)] transition-all">Add Bill</button>
                   </div>
                 </form>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </>
       )}
