@@ -53,41 +53,43 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          # Write key with exact formatting (critical for Windows-generated keys)
-          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          # Write key and fix Windows line endings (CRLF -> LF)
+          printf '%s\n' "$VPS_SSH_KEY" | sed 's/\r$//' > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-          # Debug: show key fingerprint (never exposes the key itself)
-          ssh-keygen -l -f ~/.ssh/deploy_key || echo "Key fingerprint check skipped"
+          # Verify key looks valid (show header/footer without exposing content)
+          head -1 ~/.ssh/deploy_key
+          tail -1 ~/.ssh/deploy_key
 
           # Add host key
-          ssh-keyscan -H "$VPS_IP" >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -t ed25519 -H "$VPS_IP" > ~/.ssh/known_hosts 2>/dev/null
 
-          # Write SSH config
-          cat > ~/.ssh/config <<EOF
-          Host vps
-            HostName $VPS_IP
-            User $VPS_USER
-            IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking accept-new
-            UserKnownHostsFile ~/.ssh/known_hosts
-            IdentitiesOnly yes
-            LogLevel ERROR
-          EOF
-          chmod 600 ~/.ssh/config
+          # Start ssh-agent and add key
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/deploy_key
 
-      - name: Test SSH connection
-        run: |
-          echo "Testing SSH connection..."
-          ssh vps "echo 'SSH connection successful'" || exit 1
+          # Test connection
+          ssh -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes "$VPS_USER@$VPS_IP" "echo 'SSH OK'"
 
       - name: Deploy to VPS
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_IP: ${{ secrets.VPS_IP }}
+          VPS_USER: ${{ secrets.VPS_USER }}
         run: |
-          echo "Uploading deploy.tar.gz..."
-          scp -v deploy.tar.gz vps:/tmp/ 2>&1 | tail -20
+          # Re-setup SSH for this step
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" | sed 's/\r$//' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -t ed25519 -H "$VPS_IP" > ~/.ssh/known_hosts 2>/dev/null
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/deploy_key
 
-          echo "Running remote deploy..."
-          ssh vps '
+          # Upload
+          scp -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes deploy.tar.gz "$VPS_USER@$VPS_IP:/tmp/"
+
+          # Deploy
+          ssh -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes "$VPS_USER@$VPS_IP" '
             set -e
             cd /var/www/synthr
 
@@ -118,4 +120,4 @@ jobs:
         run: |
           sleep 5
           echo "Checking app health..."
-          curl -sf http://${{ secrets.VPS_IP }}:3000 > /dev/null && echo "App is responding!" || echo "Health check inconclusive (app may still be starting)"
+          curl -sf http://${{ secrets.VPS_IP }}:3000 > /dev/null && echo "App is responding!" || echo "Health check inconclusive"
