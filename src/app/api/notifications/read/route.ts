@@ -8,7 +8,7 @@ const readSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

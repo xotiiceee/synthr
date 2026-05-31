@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { format, addMonths } from "date-fns";
+import { format } from "date-fns";
 import {
   Tabs,
   TabsList,
@@ -26,7 +26,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -38,8 +37,6 @@ import {
   Progress,
   ProgressTrack,
   ProgressIndicator,
-  ProgressLabel,
-  ProgressValue,
 } from "@/components/ui/progress";
 import {
   Select,
@@ -54,11 +51,6 @@ import {
   Cell,
   ResponsiveContainer,
   Tooltip as ReTooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
 } from "recharts";
 import {
   Plus,
@@ -66,15 +58,19 @@ import {
   Trash2,
   DollarSign,
   Target,
-  Calendar,
   TrendingUp,
   TrendingDown,
   AlertTriangle,
   CheckCircle2,
   Wallet,
-  Shield,
   CreditCard,
+  Settings,
+  Lightbulb,
+  Sparkles,
+  PiggyBank,
+  Landmark,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // ─── Helpers ───────────────────────────────────────────────
 function formatCurrency(n: number) {
@@ -185,6 +181,84 @@ async function fetchAdvisor(): Promise<AdvisorData> {
   return res.json();
 }
 
+// ─── Visual helpers ──────────────────────────────────────
+const glassCard =
+  "relative overflow-hidden border-0 bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10";
+
+function StatusGauge({
+  status,
+  actualRate,
+  targetRate,
+}: {
+  status: AdvisorData["status"];
+  actualRate: number;
+  targetRate: number;
+}) {
+  const pct = Math.min((actualRate / Math.max(targetRate, 0.01)) * 50, 100);
+  const color =
+    status === "On Track"
+      ? "#00d4aa"
+      : status === "Getting There"
+      ? "#facc15"
+      : "#ef4444";
+
+  const size = 180;
+  const strokeWidth = 14;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = Math.PI * radius;
+  const offset = circumference - (pct / 100) * circumference;
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div
+        className="relative"
+        style={{ width: size, height: size / 2 + 10 }}
+      >
+        <svg width={size} height={size / 2 + 10} className="overflow-visible">
+          <path
+            d={`M ${strokeWidth / 2} ${size / 2 + 10} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2 + 10}`}
+            fill="none"
+            stroke="rgba(255,255,255,0.06)"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+          />
+          <path
+            d={`M ${strokeWidth / 2} ${size / 2 + 10} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2 + 10}`}
+            fill="none"
+            stroke={color}
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            style={{ transition: "stroke-dashoffset 0.8s ease" }}
+          />
+        </svg>
+        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-center">
+          <span
+            className="text-3xl font-bold"
+            style={{ color }}
+          >
+            {formatPercent(actualRate)}
+          </span>
+          <span className="text-[10px] uppercase tracking-wider text-slate-500">
+            Actual Rate
+          </span>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium" style={{ backgroundColor: `${color}18`, color }}>
+        {status === "On Track" ? (
+          <CheckCircle2 className="h-4 w-4" />
+        ) : status === "Getting There" ? (
+          <TrendingUp className="h-4 w-4" />
+        ) : (
+          <AlertTriangle className="h-4 w-4" />
+        )}
+        {status}
+      </div>
+    </div>
+  );
+}
+
 // ─── Page ──────────────────────────────────────────────────
 export default function SavingsAdvisorPage() {
   const [tab, setTab] = useState("advisor");
@@ -201,7 +275,6 @@ export default function SavingsAdvisorPage() {
   } = useQuery({ queryKey: ["debts"], queryFn: fetchDebts });
   const {
     data: advisor,
-    isLoading: advisorLoading,
   } = useQuery({ queryKey: ["savings-advisor"], queryFn: fetchAdvisor });
 
   // ─── Mutations ───────────────────────────────────────────
@@ -510,22 +583,6 @@ export default function SavingsAdvisorPage() {
   }
 
   // ─── Render Helpers ──────────────────────────────────────
-  const statusColor =
-    advisor?.status === "On Track"
-      ? "text-emerald-600 bg-emerald-50 ring-emerald-200"
-      : advisor?.status === "Getting There"
-      ? "text-amber-600 bg-amber-50 ring-amber-200"
-      : "text-rose-600 bg-rose-50 ring-rose-200";
-
-  const statusIcon =
-    advisor?.status === "On Track" ? (
-      <CheckCircle2 className="h-8 w-8 text-emerald-600" />
-    ) : advisor?.status === "Getting There" ? (
-      <TrendingUp className="h-8 w-8 text-amber-600" />
-    ) : (
-      <AlertTriangle className="h-8 w-8 text-rose-600" />
-    );
-
   const allocationData = advisor
     ? [
         { name: "Debt Payoff", value: advisor.allocations.debt },
@@ -533,106 +590,271 @@ export default function SavingsAdvisorPage() {
       ].filter((d) => d.value > 0)
     : [];
 
-  const COLORS = ["#f59e0b", "#10b981"];
+  const COLORS = ["#f59e0b", "#00d4aa"];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Savings Advisor</h1>
-          <p className="text-muted-foreground">
-            Smart recommendations to maximize your savings.
+          <h1 className="text-2xl font-semibold tracking-tight text-white">
+            Savings Advisor
+          </h1>
+          <p className="text-sm text-slate-400">
+            Smart recommendations to maximize your savings
           </p>
         </div>
-        <Button variant="outline" onClick={openSettings}>
+        <Button
+          variant="outline"
+          onClick={openSettings}
+          className="border-white/10 bg-slate-800/50 text-slate-200 hover:bg-white/5 hover:text-white"
+        >
+          <Settings className="mr-2 h-4 w-4" />
           Settings
         </Button>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid w-full grid-cols-3 md:w-auto">
-          <TabsTrigger value="advisor">Advisor</TabsTrigger>
-          <TabsTrigger value="goals">Goals</TabsTrigger>
-          <TabsTrigger value="debts">Debts</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 ring-1 ring-white/10 md:w-auto">
+          <TabsTrigger
+            value="advisor"
+            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-slate-900"
+          >
+            Advisor
+          </TabsTrigger>
+          <TabsTrigger
+            value="goals"
+            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-slate-900"
+          >
+            Goals
+          </TabsTrigger>
+          <TabsTrigger
+            value="debts"
+            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-slate-900"
+          >
+            Debts
+          </TabsTrigger>
         </TabsList>
 
         {/* ─── ADVISOR TAB ────────────────────────────────── */}
         <TabsContent value="advisor" className="space-y-6">
-          {/* Status Card */}
-          <Card className={`ring-1 ${statusColor}`}>
-            <CardContent className="flex items-center gap-4 py-6">
-              {statusIcon}
-              <div>
-                <div className="text-lg font-semibold">
+          {/* Status + Gauge */}
+          <Card className={cn(glassCard)}>
+            <CardContent className="flex flex-col items-center gap-6 py-8 md:flex-row md:justify-between md:px-8">
+              <div className="flex flex-col items-center gap-2 md:items-start">
+                <div className="text-sm font-medium text-slate-400">
+                  Savings Health
+                </div>
+                <div className="text-3xl font-bold text-white">
                   {advisor?.status ?? "Loading…"}
                 </div>
-                <div className="text-sm opacity-80">
-                  Actual savings rate: {advisor ? formatPercent(advisor.actualSavingsRate) : "—"}
+                <div className="mt-1 flex items-center gap-2 text-sm text-slate-400">
+                  <Target className="h-4 w-4 text-[#00d4aa]" />
+                  Target: {advisor ? formatPercent(advisor.targetRate ?? 0.2) : "20%"}
+                </div>
+                <div className="mt-1 text-xs text-slate-500">
+                  Based on your income and expense patterns
                 </div>
               </div>
+              {advisor && (
+                <StatusGauge
+                  status={advisor.status}
+                  actualRate={advisor.actualSavingsRate}
+                  targetRate={advisor.targetRate ?? 0.2}
+                />
+              )}
             </CardContent>
           </Card>
 
           {/* Metrics */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card>
+            <Card className={cn(glassCard, "border-t-2 border-t-teal-500")}>
               <CardHeader className="pb-2">
-                <CardDescription>Average Income</CardDescription>
-                <CardTitle className="text-2xl">
-                  {advisor ? formatCurrency(advisor.avgIncome) : "—"}
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-slate-300">
+                    Average Income
+                  </CardTitle>
+                  <div className="rounded-lg bg-teal-500/10 p-2">
+                    <Landmark className="h-4 w-4 text-teal-400" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-2xl font-bold tracking-tight text-white">
+                  {advisor ? formatCurrency(advisor.avgIncome) : "—"}
+                </div>
+                <div className="mt-1 flex items-center gap-1 text-xs text-slate-500">
                   per {advisor?.incomeFrequency.toLowerCase() ?? "month"}
                 </div>
               </CardContent>
             </Card>
-            <Card>
+
+            <Card className={cn(glassCard, "border-t-2 border-t-rose-500")}>
               <CardHeader className="pb-2">
-                <CardDescription>Fixed Expenses</CardDescription>
-                <CardTitle className="text-2xl">
-                  {advisor ? formatCurrency(advisor.fixedExpenses) : "—"}
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-slate-300">
+                    Fixed Expenses
+                  </CardTitle>
+                  <div className="rounded-lg bg-rose-500/10 p-2">
+                    <TrendingDown className="h-4 w-4 text-rose-400" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-2xl font-bold tracking-tight text-white">
+                  {advisor ? formatCurrency(advisor.fixedExpenses) : "—"}
+                </div>
+                <div className="mt-1 text-xs text-slate-500">
                   Including minimum debt payments
                 </div>
               </CardContent>
             </Card>
-            <Card>
+
+            <Card className={cn(glassCard, "border-t-2 border-t-[#00d4aa]")}>
               <CardHeader className="pb-2">
-                <CardDescription>Recommended Savings</CardDescription>
-                <CardTitle className="text-2xl">
-                  {advisor ? formatCurrency(advisor.recommendedSavings) : "—"}
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-slate-300">
+                    Recommended Savings
+                  </CardTitle>
+                  <div className="rounded-lg bg-[#00d4aa]/10 p-2">
+                    <PiggyBank className="h-4 w-4 text-[#00d4aa]" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-2xl font-bold tracking-tight text-white">
+                  {advisor ? formatCurrency(advisor.recommendedSavings) : "—"}
+                </div>
+                <div className="mt-1 text-xs text-slate-500">
                   Target rate applied to income
                 </div>
               </CardContent>
             </Card>
-            <Card>
+
+            <Card className={cn(glassCard, "border-t-2 border-t-emerald-500")}>
               <CardHeader className="pb-2">
-                <CardDescription>Safe to Spend</CardDescription>
-                <CardTitle className="text-2xl">
-                  {advisor ? formatCurrency(advisor.safeToSpend) : "—"}
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-slate-300">
+                    Safe to Spend
+                  </CardTitle>
+                  <div className="rounded-lg bg-emerald-500/10 p-2">
+                    <Wallet className="h-4 w-4 text-emerald-400" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-2xl font-bold tracking-tight text-white">
+                  {advisor ? formatCurrency(advisor.safeToSpend) : "—"}
+                </div>
+                <div className="mt-1 text-xs text-slate-500">
                   After savings and fixed costs
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Savings Rate Progress */}
-          <Card>
+          {/* Recommendation */}
+          <Card className={cn(glassCard)}>
             <CardHeader>
-              <CardTitle>Actual Savings Rate vs. Target</CardTitle>
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-[#00d4aa]" />
+                <CardTitle className="text-base text-white">
+                  Recommendation
+                </CardTitle>
+              </div>
+              <CardDescription>
+                Personalized savings allocation based on your cash flow
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {advisor && (
+                <>
+                  <div className="rounded-xl bg-slate-900/60 p-4 ring-1 ring-white/5">
+                    <p className="text-sm leading-relaxed text-slate-300">
+                      Based on your income and expenses, you can safely save{" "}
+                      <span className="font-semibold text-[#00d4aa]">
+                        {formatCurrency(advisor.recommendedSavings)}
+                      </span>{" "}
+                      per month. We recommend putting{" "}
+                      <span className="font-semibold text-amber-400">
+                        {formatCurrency(advisor.allocations.debt)}
+                      </span>{" "}
+                      toward debt and{" "}
+                      <span className="font-semibold text-[#00d4aa]">
+                        {formatCurrency(advisor.allocations.goals)}
+                      </span>{" "}
+                      toward your savings goals.
+                    </p>
+                  </div>
+
+                  {allocationData.length > 0 && (
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <div className="h-48">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={allocationData}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={70}
+                              innerRadius={45}
+                              paddingAngle={4}
+                              label={((props: any) =>
+                                `${props.name}`) as any}
+                            >
+                              {allocationData.map((_, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={COLORS[index % COLORS.length]}
+                                />
+                              ))}
+                            </Pie>
+                            <ReTooltip
+                              formatter={((value: any) =>
+                                formatCurrency(value)) as any}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex flex-col justify-center gap-3">
+                        {allocationData.map((item, idx) => (
+                          <div
+                            key={item.name}
+                            className="flex items-center justify-between rounded-lg bg-slate-900/40 p-3 ring-1 ring-white/5"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span
+                                className="inline-block h-3 w-3 rounded-full"
+                                style={{
+                                  backgroundColor:
+                                    COLORS[idx % COLORS.length],
+                                }}
+                              />
+                              <span className="text-sm text-slate-300">
+                                {item.name}
+                              </span>
+                            </div>
+                            <span className="font-semibold text-white">
+                              {formatCurrency(item.value)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Savings Rate Progress */}
+          <Card className={cn(glassCard)}>
+            <CardHeader>
+              <CardTitle className="text-base text-white">
+                Actual Savings Rate vs. Target
+              </CardTitle>
               <CardDescription>
                 Target is {advisor ? formatPercent(advisor.targetRate ?? 0.2) : "20%"}
               </CardDescription>
@@ -640,16 +862,32 @@ export default function SavingsAdvisorPage() {
             <CardContent className="space-y-4">
               {advisor && (
                 <>
-                  <Progress
-                    value={Math.min(advisor.actualSavingsRate * 100, 100)}
-                    className="w-full"
-                  >
-                    <ProgressLabel>Progress</ProgressLabel>
-                    <ProgressValue>
-                      {() => formatPercent(advisor.actualSavingsRate)}
-                    </ProgressValue>
-                  </Progress>
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-400">Progress</span>
+                      <span className="font-medium text-white">
+                        {formatPercent(advisor.actualSavingsRate)}
+                      </span>
+                    </div>
+                    <Progress
+                      value={Math.min(advisor.actualSavingsRate * 100, 100)}
+                      className="w-full"
+                    >
+                      <ProgressTrack className="h-2.5 bg-slate-700/50">
+                        <ProgressIndicator
+                          className={cn(
+                            "rounded-full",
+                            advisor.actualSavingsRate >= (advisor.targetRate ?? 0.2)
+                              ? "bg-[#00d4aa]"
+                              : advisor.actualSavingsRate >= (advisor.targetRate ?? 0.2) * 0.6
+                              ? "bg-yellow-400"
+                              : "bg-red-500"
+                          )}
+                        />
+                      </ProgressTrack>
+                    </Progress>
+                  </div>
+                  <div className="flex justify-between text-sm text-slate-500">
                     <span>0%</span>
                     <span>Target: {advisor ? formatPercent(advisor.targetRate ?? 0.2) : "20%"}</span>
                     <span>100%</span>
@@ -659,144 +897,89 @@ export default function SavingsAdvisorPage() {
             </CardContent>
           </Card>
 
-          {/* Allocations & Payoff Order */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
+          {/* Payoff Strategy */}
+          {advisor && advisor.payoffOrder.length > 0 && (
+            <Card className={cn(glassCard)}>
               <CardHeader>
-                <CardTitle>Recommended Allocation</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-amber-400" />
+                  <CardTitle className="text-base text-white">
+                    Payoff Strategy
+                  </CardTitle>
+                </div>
                 <CardDescription>
-                  How to split your recommended savings
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {advisor && allocationData.length > 0 ? (
-                  <>
-                    <div className="h-48">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={allocationData}
-                            dataKey="value"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={70}
-                            label={((props: any) =>
-                              `${props.name}: ${formatCurrency(props.value)}`) as any}
-                          >
-                            {allocationData.map((_, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <ReTooltip
-                            formatter={((value: any) =>
-                              formatCurrency(value)) as any}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      {allocationData.map((item, idx) => (
-                        <div
-                          key={item.name}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="inline-block h-3 w-3 rounded-full"
-                              style={{
-                                backgroundColor:
-                                  COLORS[idx % COLORS.length],
-                              }}
-                            />
-                            <span>{item.name}</span>
-                          </div>
-                          <span className="font-medium">
-                            {formatCurrency(item.value)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-muted-foreground text-sm">
-                    No allocation recommendation yet.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Payoff Recommendation</CardTitle>
-                <CardDescription>
-                  Recommended order to eliminate debts
+                  Recommended order to eliminate debts (Avalanche: highest APR first)
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {advisor && advisor.payoffOrder.length > 0 ? (
-                  <div className="space-y-3">
-                    {advisor.payoffOrder.map((d, idx) => (
-                      <div
-                        key={d.id}
-                        className="flex items-start justify-between rounded-lg border p-3"
-                      >
-                        <div className="space-y-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-muted-foreground">
-                              #{idx + 1}
-                            </span>
-                            <span className="font-medium">{d.name}</span>
-                            <Badge variant="outline" className="text-[10px] capitalize">
-                              {d.payoffStrategy.toLowerCase()}
-                            </Badge>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            APR {d.apr}% · Min {formatCurrency(d.minimumPayment)}
-                          </div>
+                <div className="space-y-3">
+                  {advisor.payoffOrder.map((d, idx) => (
+                    <div
+                      key={d.id}
+                      className="flex items-start justify-between rounded-xl bg-slate-900/40 p-4 ring-1 ring-white/5 transition-colors hover:bg-slate-900/60"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-slate-300">
+                            {idx + 1}
+                          </span>
+                          <span className="font-medium text-white">{d.name}</span>
+                          <Badge
+                            variant="outline"
+                            className="border-white/10 text-[10px] capitalize text-slate-400"
+                          >
+                            {d.payoffStrategy.toLowerCase()}
+                          </Badge>
                         </div>
-                        <div className="text-right">
-                          <div className="font-medium">
-                            {formatCurrency(d.balance)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {d.estimatedPayoffDate
-                              ? `Payoff ${format(new Date(d.estimatedPayoffDate), "MMM yyyy")}`
-                              : "Never at minimum"}
-                          </div>
+                        <div className="pl-8 text-xs text-slate-500">
+                          APR {d.apr}% · Min {formatCurrency(d.minimumPayment)}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm">
-                    No debts to display.
-                  </p>
-                )}
+                      <div className="text-right">
+                        <div className="font-medium text-white">
+                          {formatCurrency(d.balance)}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {d.estimatedPayoffDate
+                            ? `Payoff ${format(new Date(d.estimatedPayoffDate), "MMM yyyy")}`
+                            : "Never at minimum"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
-          </div>
+          )}
         </TabsContent>
 
         {/* ─── GOALS TAB ─────────────────────────────────── */}
         <TabsContent value="goals" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Savings Goals</h2>
-            <Button onClick={openGoalCreate}>
+            <h2 className="text-lg font-semibold text-white">Savings Goals</h2>
+            <Button
+              onClick={openGoalCreate}
+              className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+            >
               <Plus className="mr-2 h-4 w-4" />
               New Goal
             </Button>
           </div>
 
           {goalsLoading ? (
-            <div className="text-muted-foreground">Loading goals…</div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i} className={cn(glassCard, "h-48 animate-pulse bg-slate-800/30")} />
+              ))}
+            </div>
           ) : goals.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
-                No savings goals yet. Create one to get started.
+            <Card className={cn(glassCard, "py-12")}>
+              <CardContent className="text-center text-muted-foreground">
+                <Target className="mx-auto mb-3 h-8 w-8 text-slate-500" />
+                <p className="text-white">No savings goals yet.</p>
+                <p className="text-sm text-slate-400">
+                  Create one to get started.
+                </p>
               </CardContent>
             </Card>
           ) : (
@@ -809,11 +992,13 @@ export default function SavingsAdvisorPage() {
                   )
                 );
                 return (
-                  <Card key={goal.id} className="flex flex-col">
+                  <Card key={goal.id} className={cn(glassCard, "flex flex-col")}>
                     <CardHeader className="pb-2">
                       <div className="flex items-start justify-between">
                         <div>
-                          <CardTitle className="text-base">{goal.name}</CardTitle>
+                          <CardTitle className="text-base text-white">
+                            {goal.name}
+                          </CardTitle>
                           <CardDescription>
                             Priority {goal.priority}
                             {goal.deadline && (
@@ -826,39 +1011,48 @@ export default function SavingsAdvisorPage() {
                         <div className="flex gap-1">
                           <Button
                             variant="ghost"
-                            size="icon-xs"
+                            size="icon"
+                            className="h-8 w-8 text-slate-400 hover:text-white"
                             onClick={() => openGoalEdit(goal)}
                           >
-                            <Pencil className="h-3 w-3" />
+                            <Pencil className="h-3.5 w-3.5" />
                           </Button>
                           <Button
                             variant="ghost"
-                            size="icon-xs"
+                            size="icon"
+                            className="h-8 w-8 text-slate-400 hover:text-red-400"
                             onClick={() => deleteGoal.mutate(goal.id)}
                           >
-                            <Trash2 className="h-3 w-3 text-destructive" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-3">
-                      <Progress value={pct} className="w-full">
-                        <ProgressLabel>Progress</ProgressLabel>
-                        <ProgressValue>{() => `${pct}%`}</ProgressValue>
-                      </Progress>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-slate-400">Progress</span>
+                          <span className="font-medium text-white">{pct}%</span>
+                        </div>
+                        <Progress value={pct} className="w-full">
+                          <ProgressTrack className="h-2 bg-slate-700/50">
+                            <ProgressIndicator className="rounded-full bg-[#00d4aa]" />
+                          </ProgressTrack>
+                        </Progress>
+                      </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
+                        <span className="text-slate-400">
                           {formatCurrency(goal.currentAmount)}
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium text-white">
                           {formatCurrency(goal.targetAmount)}
                         </span>
                       </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="border-t border-white/5 bg-slate-900/30">
                       <Button
                         variant="secondary"
-                        className="w-full"
+                        className="w-full bg-slate-700/40 text-white hover:bg-slate-700/60"
                         onClick={() => {
                           setContributeGoalId(goal.id);
                           contributeForm.reset({ amount: 0 });
@@ -878,74 +1072,97 @@ export default function SavingsAdvisorPage() {
         {/* ─── DEBTS TAB ──────────────────────────────────── */}
         <TabsContent value="debts" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Debt Tracking</h2>
-            <Button onClick={openDebtCreate}>
+            <h2 className="text-lg font-semibold text-white">Debt Tracking</h2>
+            <Button
+              onClick={openDebtCreate}
+              className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+            >
               <Plus className="mr-2 h-4 w-4" />
               New Debt
             </Button>
           </div>
 
           {debtsLoading ? (
-            <div className="text-muted-foreground">Loading debts…</div>
+            <div className="space-y-4">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <Card key={i} className={cn(glassCard, "h-28 animate-pulse bg-slate-800/30")} />
+              ))}
+            </div>
           ) : debts.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
-                No debts tracked yet. Add one to see payoff recommendations.
+            <Card className={cn(glassCard, "py-12")}>
+              <CardContent className="text-center text-muted-foreground">
+                <CreditCard className="mx-auto mb-3 h-8 w-8 text-slate-500" />
+                <p className="text-white">No debts tracked yet.</p>
+                <p className="text-sm text-slate-400">
+                  Add one to see payoff recommendations.
+                </p>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-4">
               <div className="grid gap-4">
                 {debts.map((debt) => (
-                  <Card key={debt.id}>
-                    <CardContent className="py-4">
+                  <Card key={debt.id} className={cn(glassCard)}>
+                    <CardContent className="py-5">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <CreditCard className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">{debt.name}</span>
-                            <Badge variant="outline" className="text-[10px] capitalize">
+                            <CreditCard className="h-4 w-4 text-slate-400" />
+                            <span className="font-medium text-white">
+                              {debt.name}
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className="border-white/10 text-[10px] capitalize text-slate-400"
+                            >
                               {debt.type}
                             </Badge>
-                            <Badge variant="secondary" className="text-[10px]">
+                            <Badge
+                              variant="secondary"
+                              className="bg-slate-700/40 text-[10px] text-slate-300"
+                            >
                               {debt.payoffStrategy}
                             </Badge>
                           </div>
-                          <div className="text-xs text-muted-foreground">
-                            APR {debt.apr}% · Minimum {formatCurrency(debt.minimumPayment)}
+                          <div className="text-xs text-slate-500">
+                            APR {debt.apr}% · Minimum{" "}
+                            {formatCurrency(debt.minimumPayment)}
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <div className="font-semibold">
+                            <div className="font-semibold text-white">
                               {formatCurrency(debt.balance)}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-slate-500">
                               Balance
                             </div>
                           </div>
                           <div className="flex gap-1">
                             <Button
                               variant="ghost"
-                              size="icon-xs"
+                              size="icon"
+                              className="h-8 w-8 text-slate-400 hover:text-white"
                               onClick={() => openDebtEdit(debt)}
                             >
-                              <Pencil className="h-3 w-3" />
+                              <Pencil className="h-3.5 w-3.5" />
                             </Button>
                             <Button
                               variant="ghost"
-                              size="icon-xs"
+                              size="icon"
+                              className="h-8 w-8 text-slate-400 hover:text-red-400"
                               onClick={() => deleteDebt.mutate(debt.id)}
                             >
-                              <Trash2 className="h-3 w-3 text-destructive" />
+                              <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
                         </div>
                       </div>
-                      <div className="mt-3 flex items-center gap-2">
+                      <div className="mt-4 flex items-center gap-2">
                         <Button
                           variant="secondary"
                           size="sm"
+                          className="bg-slate-700/40 text-white hover:bg-slate-700/60"
                           onClick={() => {
                             setPaymentDebtId(debt.id);
                             paymentForm.reset({ amount: 0 });
@@ -961,9 +1178,11 @@ export default function SavingsAdvisorPage() {
               </div>
 
               {advisor && advisor.payoffOrder.length > 0 && (
-                <Card>
+                <Card className={cn(glassCard)}>
                   <CardHeader>
-                    <CardTitle>Recommended Payoff Order</CardTitle>
+                    <CardTitle className="text-base text-white">
+                      Recommended Payoff Order
+                    </CardTitle>
                     <CardDescription>
                       Sorted by each debt&apos;s chosen strategy
                     </CardDescription>
@@ -973,15 +1192,17 @@ export default function SavingsAdvisorPage() {
                       {advisor.payoffOrder.map((d, idx) => (
                         <div
                           key={d.id}
-                          className="flex items-center justify-between rounded-lg border p-3"
+                          className="flex items-center justify-between rounded-xl bg-slate-900/40 p-4 ring-1 ring-white/5 transition-colors hover:bg-slate-900/60"
                         >
                           <div className="flex items-center gap-3">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-bold">
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-slate-300">
                               {idx + 1}
                             </span>
                             <div>
-                              <div className="font-medium">{d.name}</div>
-                              <div className="text-xs text-muted-foreground">
+                              <div className="font-medium text-white">
+                                {d.name}
+                              </div>
+                              <div className="text-xs text-slate-500">
                                 {d.estimatedPayoffDate
                                   ? `Estimated payoff ${format(new Date(d.estimatedPayoffDate), "MMM yyyy")}`
                                   : "Cannot payoff at minimum rate"}
@@ -989,8 +1210,10 @@ export default function SavingsAdvisorPage() {
                             </div>
                           </div>
                           <div className="text-right text-sm">
-                            <div>{formatCurrency(d.balance)}</div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-white">
+                              {formatCurrency(d.balance)}
+                            </div>
+                            <div className="text-xs text-slate-500">
                               {d.apr}% APR
                             </div>
                           </div>
@@ -1007,9 +1230,9 @@ export default function SavingsAdvisorPage() {
 
       {/* ─── Goal Dialog ────────────────────────────────── */}
       <Dialog open={goalDialogOpen} onOpenChange={setGoalDialogOpen}>
-        <DialogContent>
+        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-white">
               {editingGoal ? "Edit Goal" : "New Savings Goal"}
             </DialogTitle>
             <DialogDescription>
@@ -1024,7 +1247,11 @@ export default function SavingsAdvisorPage() {
           >
             <div className="space-y-1">
               <Label htmlFor="g-name">Name</Label>
-              <Input id="g-name" {...goalForm.register("name")} />
+              <Input
+                id="g-name"
+                {...goalForm.register("name")}
+                className="bg-slate-800 ring-1 ring-white/10"
+              />
               {goalForm.formState.errors.name && (
                 <p className="text-xs text-destructive">
                   {String(goalForm.formState.errors.name.message)}
@@ -1039,6 +1266,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...goalForm.register("targetAmount")}
+                  className="bg-slate-800 ring-1 ring-white/10"
                 />
                 {goalForm.formState.errors.targetAmount && (
                   <p className="text-xs text-destructive">
@@ -1053,13 +1281,19 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...goalForm.register("currentAmount")}
+                  className="bg-slate-800 ring-1 ring-white/10"
                 />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <Label htmlFor="g-deadline">Deadline</Label>
-                <Input id="g-deadline" type="date" {...goalForm.register("deadline")} />
+                <Input
+                  id="g-deadline"
+                  type="date"
+                  {...goalForm.register("deadline")}
+                  className="bg-slate-800 ring-1 ring-white/10"
+                />
               </div>
               <div className="space-y-1">
                 <Label htmlFor="g-priority">Priority (1-5)</Label>
@@ -1069,6 +1303,7 @@ export default function SavingsAdvisorPage() {
                   min={1}
                   max={5}
                   {...goalForm.register("priority")}
+                  className="bg-slate-800 ring-1 ring-white/10"
                 />
                 {goalForm.formState.errors.priority && (
                   <p className="text-xs text-destructive">
@@ -1078,7 +1313,10 @@ export default function SavingsAdvisorPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">
+              <Button
+                type="submit"
+                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              >
                 {editingGoal ? "Save Changes" : "Create Goal"}
               </Button>
             </DialogFooter>
@@ -1096,9 +1334,9 @@ export default function SavingsAdvisorPage() {
           }
         }}
       >
-        <DialogContent>
+        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
           <DialogHeader>
-            <DialogTitle>Contribute to Goal</DialogTitle>
+            <DialogTitle className="text-white">Contribute to Goal</DialogTitle>
             <DialogDescription>
               Add money toward your savings goal.
             </DialogDescription>
@@ -1114,6 +1352,7 @@ export default function SavingsAdvisorPage() {
                 type="number"
                 step="0.01"
                 {...contributeForm.register("amount")}
+                className="bg-slate-800 ring-1 ring-white/10"
               />
               {contributeForm.formState.errors.amount && (
                 <p className="text-xs text-destructive">
@@ -1122,7 +1361,12 @@ export default function SavingsAdvisorPage() {
               )}
             </div>
             <DialogFooter>
-              <Button type="submit">Contribute</Button>
+              <Button
+                type="submit"
+                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              >
+                Contribute
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1130,9 +1374,9 @@ export default function SavingsAdvisorPage() {
 
       {/* ─── Debt Dialog ────────────────────────────────── */}
       <Dialog open={debtDialogOpen} onOpenChange={setDebtDialogOpen}>
-        <DialogContent>
+        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-white">
               {editingDebt ? "Edit Debt" : "New Debt"}
             </DialogTitle>
             <DialogDescription>
@@ -1147,7 +1391,11 @@ export default function SavingsAdvisorPage() {
           >
             <div className="space-y-1">
               <Label htmlFor="d-name">Name</Label>
-              <Input id="d-name" {...debtForm.register("name")} />
+              <Input
+                id="d-name"
+                {...debtForm.register("name")}
+                className="bg-slate-800 ring-1 ring-white/10"
+              />
               {debtForm.formState.errors.name && (
                 <p className="text-xs text-destructive">
                   {String(debtForm.formState.errors.name.message)}
@@ -1160,6 +1408,7 @@ export default function SavingsAdvisorPage() {
                 id="d-type"
                 placeholder="e.g. credit_card, student_loan"
                 {...debtForm.register("type")}
+                className="bg-slate-800 ring-1 ring-white/10"
               />
               {debtForm.formState.errors.type && (
                 <p className="text-xs text-destructive">
@@ -1175,6 +1424,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...debtForm.register("balance")}
+                  className="bg-slate-800 ring-1 ring-white/10"
                 />
               </div>
               <div className="space-y-1">
@@ -1184,6 +1434,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...debtForm.register("apr")}
+                  className="bg-slate-800 ring-1 ring-white/10"
                 />
               </div>
             </div>
@@ -1195,6 +1446,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...debtForm.register("minimumPayment")}
+                  className="bg-slate-800 ring-1 ring-white/10"
                 />
                 {debtForm.formState.errors.minimumPayment && (
                   <p className="text-xs text-destructive">
@@ -1209,12 +1461,25 @@ export default function SavingsAdvisorPage() {
                   name="payoffStrategy"
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger id="d-strategy">
+                      <SelectTrigger
+                        id="d-strategy"
+                        className="bg-slate-800 ring-1 ring-white/10"
+                      >
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="AVALANCHE">Avalanche</SelectItem>
-                        <SelectItem value="SNOWBALL">Snowball</SelectItem>
+                      <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
+                        <SelectItem
+                          value="AVALANCHE"
+                          className="focus:bg-slate-700"
+                        >
+                          Avalanche
+                        </SelectItem>
+                        <SelectItem
+                          value="SNOWBALL"
+                          className="focus:bg-slate-700"
+                        >
+                          Snowball
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -1222,7 +1487,10 @@ export default function SavingsAdvisorPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">
+              <Button
+                type="submit"
+                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              >
                 {editingDebt ? "Save Changes" : "Create Debt"}
               </Button>
             </DialogFooter>
@@ -1240,9 +1508,9 @@ export default function SavingsAdvisorPage() {
           }
         }}
       >
-        <DialogContent>
+        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
           <DialogHeader>
-            <DialogTitle>Record Extra Payment</DialogTitle>
+            <DialogTitle className="text-white">Record Extra Payment</DialogTitle>
             <DialogDescription>
               Reduce your debt balance with an extra payment.
             </DialogDescription>
@@ -1258,6 +1526,7 @@ export default function SavingsAdvisorPage() {
                 type="number"
                 step="0.01"
                 {...paymentForm.register("amount")}
+                className="bg-slate-800 ring-1 ring-white/10"
               />
               {paymentForm.formState.errors.amount && (
                 <p className="text-xs text-destructive">
@@ -1266,7 +1535,12 @@ export default function SavingsAdvisorPage() {
               )}
             </div>
             <DialogFooter>
-              <Button type="submit">Record Payment</Button>
+              <Button
+                type="submit"
+                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              >
+                Record Payment
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1274,9 +1548,9 @@ export default function SavingsAdvisorPage() {
 
       {/* ─── Settings Dialog ────────────────────────────── */}
       <Dialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
           <DialogHeader>
-            <DialogTitle>Advisor Settings</DialogTitle>
+            <DialogTitle className="text-white">Advisor Settings</DialogTitle>
             <DialogDescription>
               Adjust your income frequency, savings target, and fixed expenses.
             </DialogDescription>
@@ -1292,15 +1566,28 @@ export default function SavingsAdvisorPage() {
                 name="incomeFrequency"
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="s-freq">
+                    <SelectTrigger
+                      id="s-freq"
+                      className="bg-slate-800 ring-1 ring-white/10"
+                    >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="DAILY">Daily</SelectItem>
-                      <SelectItem value="WEEKLY">Weekly</SelectItem>
-                      <SelectItem value="BIWEEKLY">Biweekly</SelectItem>
-                      <SelectItem value="MONTHLY">Monthly</SelectItem>
-                      <SelectItem value="YEARLY">Yearly</SelectItem>
+                    <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
+                      {[
+                        "DAILY",
+                        "WEEKLY",
+                        "BIWEEKLY",
+                        "MONTHLY",
+                        "YEARLY",
+                      ].map((f) => (
+                        <SelectItem
+                          key={f}
+                          value={f}
+                          className="focus:bg-slate-700"
+                        >
+                          {f.charAt(0) + f.slice(1).toLowerCase()}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}
@@ -1315,6 +1602,7 @@ export default function SavingsAdvisorPage() {
                 min={0}
                 max={1}
                 {...settingsForm.register("targetRate")}
+                className="bg-slate-800 ring-1 ring-white/10"
               />
               {settingsForm.formState.errors.targetRate && (
                 <p className="text-xs text-destructive">
@@ -1330,13 +1618,19 @@ export default function SavingsAdvisorPage() {
                 step="0.01"
                 min={0}
                 {...settingsForm.register("fixedExpenses")}
+                className="bg-slate-800 ring-1 ring-white/10"
               />
               <p className="text-xs text-muted-foreground">
                 Debt minimums are added automatically.
               </p>
             </div>
             <DialogFooter>
-              <Button type="submit">Save Settings</Button>
+              <Button
+                type="submit"
+                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              >
+                Save Settings
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

@@ -11,8 +11,8 @@ const createSchema = z.object({
   priority: z.number().min(1).max(5).default(1),
 });
 
-export async function GET() {
-  const session = await auth();
+export async function GET(req: NextRequest) {
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -26,7 +26,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

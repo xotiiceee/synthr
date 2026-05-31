@@ -12,8 +12,8 @@ const createSchema = z.object({
   payoffStrategy: z.enum(["AVALANCHE", "SNOWBALL"]).default("AVALANCHE"),
 });
 
-export async function GET() {
-  const session = await auth();
+export async function GET(req: NextRequest) {
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -27,7 +27,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

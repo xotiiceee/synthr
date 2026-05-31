@@ -8,11 +8,6 @@ import {
   Cell,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Legend,
 } from "recharts";
 import {
@@ -46,7 +41,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, TrendingUp, TrendingDown } from "lucide-react";
+import { Plus, Pencil, Trash2, TrendingUp, TrendingDown, RefreshCw, Briefcase, PieChart as PieChartIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Holding {
   id: string;
@@ -71,6 +67,8 @@ interface Account {
 
 const COLORS = ["#00d4aa", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#6366f1"];
 
+const glassCard = "relative overflow-hidden border-0 bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10";
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -86,6 +84,7 @@ export default function InvestmentsPage() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHolding, setEditingHolding] = useState<Holding | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [form, setForm] = useState({
     symbol: "",
     quantity: "",
@@ -206,6 +205,12 @@ export default function InvestmentsPage() {
     }
   }
 
+  async function handleRefresh() {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ["investments"] });
+    setRefreshing(false);
+  }
+
   const holdings = data?.holdings ?? [];
   const summary = data?.summary;
 
@@ -214,19 +219,19 @@ export default function InvestmentsPage() {
     value: h.marketValue,
   }));
 
-  // Synthetic line chart data: cost basis vs market value snapshot
-  const lineData = summary
-    ? [
-        { name: "Cost Basis", value: summary.totalCostBasis },
-        { name: "Market Value", value: summary.totalMarketValue },
-      ]
-    : [];
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Investments</h1>
-        <Button onClick={openAddDialog}>
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-100">Investments</h1>
+          {summary && (
+            <p className="text-sm text-slate-400">
+              Portfolio value {formatCurrency(summary.totalMarketValue)}
+            </p>
+          )}
+        </div>
+        <Button onClick={openAddDialog} className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90">
           <Plus className="mr-2 h-4 w-4" />
           Add Holding
         </Button>
@@ -235,196 +240,212 @@ export default function InvestmentsPage() {
       {/* Summary Cards */}
       {summary && (
         <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Market Value
-              </CardTitle>
+          <Card className={cn(glassCard)}>
+            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#00d4aa]/10 blur-2xl" />
+            <CardHeader className="relative pb-2">
+              <CardTitle className="text-sm font-medium text-slate-400">Total Market Value</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(summary.totalMarketValue)}</div>
+            <CardContent className="relative">
+              <div className="text-2xl font-bold text-[#00d4aa]">{formatCurrency(summary.totalMarketValue)}</div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Unrealized Gain/Loss
-              </CardTitle>
+
+          <Card className={cn(glassCard)}>
+            <div className={cn("absolute -right-6 -top-6 h-24 w-24 rounded-full blur-2xl", summary.totalUnrealizedGain >= 0 ? "bg-emerald-500/10" : "bg-rose-500/10")} />
+            <CardHeader className="relative pb-2">
+              <CardTitle className="text-sm font-medium text-slate-400">Total Unrealized Gain/Loss</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <div className="flex items-center gap-2">
-                <div className={`text-2xl font-bold ${summary.totalUnrealizedGain >= 0 ? "text-green-500" : "text-red-500"}`}>
+                <div className={cn("text-2xl font-bold", summary.totalUnrealizedGain >= 0 ? "text-emerald-400" : "text-rose-400")}>
                   {formatCurrency(summary.totalUnrealizedGain)}
                 </div>
                 {summary.totalUnrealizedGain >= 0 ? (
-                  <TrendingUp className="h-5 w-5 text-green-500" />
+                  <TrendingUp className="h-5 w-5 text-emerald-400" />
                 ) : (
-                  <TrendingDown className="h-5 w-5 text-red-500" />
+                  <TrendingDown className="h-5 w-5 text-rose-400" />
                 )}
               </div>
-              <div className={`text-sm ${summary.totalUnrealizedGain >= 0 ? "text-green-500" : "text-red-500"}`}>
+              <div className={cn("text-sm", summary.totalUnrealizedGain >= 0 ? "text-emerald-400" : "text-rose-400")}>
                 {formatPercent(summary.totalUnrealizedGainPercent)}
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Cost Basis
-              </CardTitle>
+
+          <Card className={cn(glassCard)}>
+            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-slate-400/10 blur-2xl" />
+            <CardHeader className="relative pb-2">
+              <CardTitle className="text-sm font-medium text-slate-400">Total Cost Basis</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(summary.totalCostBasis)}</div>
+            <CardContent className="relative">
+              <div className="text-2xl font-bold text-slate-200">{formatCurrency(summary.totalCostBasis)}</div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Charts */}
+      {/* Pie Chart */}
       {holdings.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Portfolio Allocation</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {pieData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value: any) => formatCurrency(Number(value))} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Portfolio Snapshot</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={lineData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(value: any) => formatCurrency(Number(value))} />
-                  <Legend />
-                  <Line type="monotone" dataKey="value" stroke="#00d4aa" strokeWidth={3} dot={{ r: 6 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className={cn(glassCard)}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-slate-200">
+              <PieChartIcon className="h-5 w-5 text-[#00d4aa]" />
+              Portfolio Allocation
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={320}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={110}
+                  paddingAngle={3}
+                  dataKey="value"
+                  nameKey="name"
+                  stroke="none"
+                >
+                  {pieData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
+                  formatter={(value: any) => formatCurrency(Number(value))}
+                />
+                <Legend wrapperStyle={{ color: "#94a3b8" }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       )}
 
       {/* Holdings Table */}
-      <Card>
+      <Card className={cn(glassCard)}>
         <CardHeader>
-          <CardTitle>Holdings</CardTitle>
+          <CardTitle className="text-slate-200">Holdings</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="py-8 text-center text-muted-foreground">Loading...</div>
+            <div className="py-12 text-center text-slate-400">Loading holdings...</div>
           ) : holdings.length === 0 ? (
-            <div className="py-8 text-center text-muted-foreground">
-              No holdings yet. Add your first investment to get started.
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Briefcase className="mb-4 h-12 w-12 text-slate-500" />
+              <h3 className="text-lg font-semibold text-slate-200">No holdings yet</h3>
+              <p className="mb-6 mt-1 max-w-sm text-sm text-slate-400">
+                Add your first investment to start tracking your portfolio performance.
+              </p>
+              <Button onClick={openAddDialog} className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90">
+                <Plus className="mr-2 h-4 w-4" />
+                Add your first holding
+              </Button>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Symbol</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Avg Cost</TableHead>
-                  <TableHead>Live Price</TableHead>
-                  <TableHead>Market Value</TableHead>
-                  <TableHead>Gain/Loss</TableHead>
-                  <TableHead>Gain/Loss %</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {holdings.map((h) => (
-                  <TableRow key={h.id}>
-                    <TableCell className="font-medium">{h.symbol}</TableCell>
-                    <TableCell>{h.quantity.toFixed(4)}</TableCell>
-                    <TableCell>{formatCurrency(h.avgCost)}</TableCell>
-                    <TableCell>{formatCurrency(h.livePrice)}</TableCell>
-                    <TableCell>{formatCurrency(h.marketValue)}</TableCell>
-                    <TableCell className={h.unrealizedGain >= 0 ? "text-green-500" : "text-red-500"}>
-                      {formatCurrency(h.unrealizedGain)}
-                    </TableCell>
-                    <TableCell className={h.unrealizedGainPercent >= 0 ? "text-green-500" : "text-red-500"}>
-                      {formatPercent(h.unrealizedGainPercent)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon-sm" onClick={() => openEditDialog(h)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-white/5 hover:bg-transparent">
+                    <TableHead className="text-slate-400">Symbol</TableHead>
+                    <TableHead className="text-slate-400">Quantity</TableHead>
+                    <TableHead className="text-slate-400">Avg Cost</TableHead>
+                    <TableHead className="text-slate-400">
+                      <div className="flex items-center gap-2">
+                        Live Price
                         <Button
                           variant="ghost"
-                          size="icon-sm"
-                          className="text-red-500"
-                          onClick={() => deleteMutation.mutate(h.id)}
+                          size="icon-xs"
+                          onClick={handleRefresh}
+                          disabled={refreshing}
+                          className="h-6 w-6 text-slate-400 hover:text-slate-200"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <RefreshCw className={cn("h-3 w-3", refreshing && "animate-spin")} />
                         </Button>
                       </div>
-                    </TableCell>
+                    </TableHead>
+                    <TableHead className="text-slate-400">Market Value</TableHead>
+                    <TableHead className="text-slate-400">Gain/Loss</TableHead>
+                    <TableHead className="text-slate-400">Gain/Loss %</TableHead>
+                    <TableHead className="text-right text-slate-400">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {holdings.map((h) => (
+                    <TableRow key={h.id} className="border-white/5">
+                      <TableCell className="font-bold text-slate-200">{h.symbol}</TableCell>
+                      <TableCell className="text-slate-300">{h.quantity.toFixed(4)}</TableCell>
+                      <TableCell className="text-slate-300">{formatCurrency(h.avgCost)}</TableCell>
+                      <TableCell className="text-slate-300">{formatCurrency(h.livePrice)}</TableCell>
+                      <TableCell className="font-medium text-slate-200">{formatCurrency(h.marketValue)}</TableCell>
+                      <TableCell className={cn("font-medium", h.unrealizedGain >= 0 ? "text-emerald-400" : "text-rose-400")}>
+                        {formatCurrency(h.unrealizedGain)}
+                      </TableCell>
+                      <TableCell className={cn("font-medium", h.unrealizedGainPercent >= 0 ? "text-emerald-400" : "text-rose-400")}>
+                        {formatPercent(h.unrealizedGainPercent)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openEditDialog(h)}
+                            className="text-slate-400 hover:text-slate-200"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="text-slate-400 hover:text-rose-400"
+                            onClick={() => deleteMutation.mutate(h.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
           <DialogHeader>
-            <DialogTitle>{editingHolding ? "Edit Holding" : "Add Holding"}</DialogTitle>
+            <DialogTitle className="text-slate-100">{editingHolding ? "Edit Holding" : "Add Holding"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             {!editingHolding && (
               <div className="space-y-2">
-                <Label htmlFor="symbol">Symbol</Label>
+                <Label htmlFor="symbol" className="text-slate-300">Symbol</Label>
                 <Input
                   id="symbol"
                   value={form.symbol}
                   onChange={(e) => setForm({ ...form, symbol: e.target.value })}
                   placeholder="AAPL"
                   required
+                  className="bg-slate-800 ring-1 ring-white/10"
                 />
               </div>
             )}
             {!editingHolding && (
               <div className="space-y-2">
-                <Label htmlFor="account">Account</Label>
+                <Label htmlFor="account" className="text-slate-300">Account</Label>
                 <Select
                   value={form.accountId}
                   onValueChange={(value: string | null) => setForm({ ...form, accountId: value ?? "" })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-slate-800 ring-1 ring-white/10">
                     <SelectValue placeholder="Select account" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
                     {accounts?.map((acc) => (
-                      <SelectItem key={acc.id} value={acc.id}>
+                      <SelectItem key={acc.id} value={acc.id} className="focus:bg-slate-700">
                         {acc.name}
                       </SelectItem>
                     ))}
@@ -433,7 +454,7 @@ export default function InvestmentsPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity</Label>
+              <Label htmlFor="quantity" className="text-slate-300">Quantity</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -442,10 +463,11 @@ export default function InvestmentsPage() {
                 onChange={(e) => setForm({ ...form, quantity: e.target.value })}
                 placeholder="10"
                 required
+                className="bg-slate-800 ring-1 ring-white/10"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="avgCost">Average Cost</Label>
+              <Label htmlFor="avgCost" className="text-slate-300">Average Cost</Label>
               <Input
                 id="avgCost"
                 type="number"
@@ -454,10 +476,15 @@ export default function InvestmentsPage() {
                 onChange={(e) => setForm({ ...form, avgCost: e.target.value })}
                 placeholder="150.00"
                 required
+                className="bg-slate-800 ring-1 ring-white/10"
               />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              >
                 {editingHolding ? "Save Changes" : "Add Holding"}
               </Button>
             </DialogFooter>

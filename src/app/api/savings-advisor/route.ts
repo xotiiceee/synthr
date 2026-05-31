@@ -50,8 +50,8 @@ function estimatePayoffMonths(balance: number, apr: number, minimumPayment: numb
   return -Math.log(1 - (r * balance) / minimumPayment) / Math.log(1 + r);
 }
 
-export async function GET() {
-  const session = await auth();
+export async function GET(req: NextRequest) {
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -211,7 +211,7 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  const session = await auth();
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

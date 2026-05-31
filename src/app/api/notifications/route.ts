@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { NotificationType } from "@prisma/client";
 
-export async function GET() {
-  const session = await auth();
+export async function GET(req: NextRequest) {
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -30,7 +30,7 @@ const createNotificationSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
+  const session = await auth(req);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
