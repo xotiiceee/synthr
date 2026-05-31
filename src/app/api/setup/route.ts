@@ -13,6 +13,7 @@ const setupSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const session = await auth();
+  console.log("Setup API session:", session ? "authenticated" : "none");
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

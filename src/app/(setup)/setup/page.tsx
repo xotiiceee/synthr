@@ -47,6 +47,7 @@ export default function SetupPage() {
 
   const onSubmit = async (data: SetupData) => {
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/setup", {
         method: "POST",
@@ -54,10 +55,16 @@ export default function SetupPage() {
         body: JSON.stringify(data),
       });
 
-      if (res.ok) {
-        router.push("/dashboard");
-        router.refresh();
+      if (!res.ok) {
+        const err = await res.json();
+        setError(err.message || "Setup failed. Please try again.");
+        return;
       }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
