@@ -13,9 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { formatCurrency } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, TrendingDown, Receipt, Repeat, Clock, ArrowUpRight, ArrowDownRight, Plus, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, TrendingDown, Receipt, Repeat, Clock, ArrowUpRight, ArrowDownRight, Plus, Trash2, X } from "lucide-react";
 
 const billSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -32,6 +31,7 @@ function getMonthParam(date: Date) { return format(date, "yyyy-MM"); }
 
 export default function MonthlyExpensesPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showAdd, setShowAdd] = useState(false);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -52,7 +52,7 @@ export default function MonthlyExpensesPage() {
     },
   });
 
-  const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm<BillForm>({
+  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<BillForm>({
     resolver: zodResolver(billSchema),
     defaultValues: { startDate: format(new Date(), "yyyy-MM-dd") },
   });
@@ -69,6 +69,7 @@ export default function MonthlyExpensesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["monthly-expenses"] });
+      setShowAdd(false);
       reset();
       toast.success("Recurring bill added");
     },
@@ -76,9 +77,7 @@ export default function MonthlyExpensesPage() {
   });
 
   const deleteBill = useMutation({
-    mutationFn: async (id: string) => {
-      await fetch(`/api/recurring/${id}`, { method: "DELETE" });
-    },
+    mutationFn: async (id: string) => { await fetch(`/api/recurring/${id}`, { method: "DELETE" }); },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["monthly-expenses"] });
       toast.success("Bill removed");
@@ -167,124 +166,15 @@ export default function MonthlyExpensesPage() {
             <Card className="bg-zinc-900 border-white/5 rounded-xl">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recurring Bills</CardTitle>
-                <Dialog>
-                  <DialogTrigger>
-                    <Button size="sm" className="bg-[#00d4aa] text-black font-semibold hover:shadow-[0_0_20px_rgba(0,212,170,0.15)]">
-                      <Plus className="h-4 w-4 mr-1" /> Add
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-zinc-900 border-white/5 sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Add Recurring Bill</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleSubmit((d) => addBill.mutate(d))} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-zinc-400">Bill Name</Label>
-                        <Input {...register("name")} placeholder="e.g. Netflix, Rent" className="bg-zinc-950 border-white/10" />
-                        {errors.name && <p className="text-xs text-red-400">{errors.name.message}</p>}
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-zinc-400">Amount</Label>
-                          <Input {...register("amount")} type="text" inputMode="decimal" placeholder="0.00" className="bg-zinc-950 border-white/10" />
-                          {errors.amount && <p className="text-xs text-red-400">{errors.amount.message}</p>}
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-zinc-400">Frequency</Label>
-                          <Select onValueChange={(v) => setValue("frequency", v as any)} defaultValue="MONTHLY">
-                            <SelectTrigger className="bg-zinc-950 border-white/10"><SelectValue /></SelectTrigger>
-                            <SelectContent className="bg-zinc-900 border-white/10">
-                              <SelectItem value="WEEKLY">Weekly</SelectItem>
-                              <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
-                              <SelectItem value="MONTHLY">Monthly</SelectItem>
-                              <SelectItem value="YEARLY">Yearly</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-zinc-400">Start Date</Label>
-                          <Input {...register("startDate")} type="date" className="bg-zinc-950 border-white/10" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-zinc-400">Account</Label>
-                          <Select onValueChange={(v) => setValue("accountId", String(v || ""))}>
-                            <SelectTrigger className="bg-zinc-950 border-white/10"><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent className="bg-zinc-900 border-white/10">
-                              {accounts?.map((a: any) => (
-                                <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {errors.accountId && <p className="text-xs text-red-400">{errors.accountId.message}</p>}
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <DialogClose>
-                          <Button type="button" variant="ghost">Cancel</Button>
-                        </DialogClose>
-                        <Button type="submit" className="bg-[#00d4aa] text-black font-semibold">Add Bill</Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                <Button size="sm" onClick={() => setShowAdd(true)} className="bg-[#00d4aa] text-black font-semibold hover:shadow-[0_0_20px_rgba(0,212,170,0.15)]">
+                  <Plus className="h-4 w-4 mr-1" /> Add
+                </Button>
               </CardHeader>
               <CardContent>
                 {data.recurringRules.length === 0 ? (
                   <div className="py-8 text-center">
                     <p className="text-sm text-zinc-400">No recurring bills set up</p>
-                    <Dialog>
-                      <DialogTrigger>
-                        <Button variant="link" className="text-[#00d4aa] mt-2">Add your first recurring bill</Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-zinc-900 border-white/5 sm:max-w-md">
-                        <DialogHeader><DialogTitle>Add Recurring Bill</DialogTitle></DialogHeader>
-                        <form onSubmit={handleSubmit((d) => addBill.mutate(d))} className="space-y-4">
-                          <div className="space-y-2">
-                            <Label className="text-zinc-400">Bill Name</Label>
-                            <Input {...register("name")} placeholder="e.g. Netflix, Rent" className="bg-zinc-950 border-white/10" />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label className="text-zinc-400">Amount</Label>
-                              <Input {...register("amount")} type="text" inputMode="decimal" placeholder="0.00" className="bg-zinc-950 border-white/10" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-zinc-400">Frequency</Label>
-                              <Select onValueChange={(v) => setValue("frequency", v as any)} defaultValue="MONTHLY">
-                                <SelectTrigger className="bg-zinc-950 border-white/10"><SelectValue /></SelectTrigger>
-                                <SelectContent className="bg-zinc-900 border-white/10">
-                                  <SelectItem value="WEEKLY">Weekly</SelectItem>
-                                  <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
-                                  <SelectItem value="MONTHLY">Monthly</SelectItem>
-                                  <SelectItem value="YEARLY">Yearly</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label className="text-zinc-400">Start Date</Label>
-                              <Input {...register("startDate")} type="date" className="bg-zinc-950 border-white/10" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-zinc-400">Account</Label>
-                              <Select onValueChange={(v) => setValue("accountId", String(v || ""))}>
-                                <SelectTrigger className="bg-zinc-950 border-white/10"><SelectValue placeholder="Select" /></SelectTrigger>
-                                <SelectContent className="bg-zinc-900 border-white/10">
-                                  {accounts?.map((a: any) => (<SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <DialogClose><Button type="button" variant="ghost">Cancel</Button></DialogClose>
-                            <Button type="submit" className="bg-[#00d4aa] text-black font-semibold">Add Bill</Button>
-                          </DialogFooter>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
+                    <Button variant="link" onClick={() => setShowAdd(true)} className="text-[#00d4aa] mt-2">Add your first recurring bill</Button>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -314,6 +204,69 @@ export default function MonthlyExpensesPage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Simple Modal — no @base-ui/react dependency */}
+          {showAdd && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="fixed inset-0 bg-black/60" onClick={() => setShowAdd(false)} />
+              <div className="relative z-50 w-full max-w-md mx-4 bg-zinc-900 border border-white/10 rounded-xl p-6 shadow-2xl">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Add Recurring Bill</h2>
+                  <Button variant="ghost" size="icon" onClick={() => setShowAdd(false)} className="h-8 w-8">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <form onSubmit={handleSubmit((d) => addBill.mutate(d))} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400">Bill Name</Label>
+                    <Input {...register("name")} placeholder="e.g. Netflix, Rent" className="bg-zinc-950 border-white/10" />
+                    {errors.name && <p className="text-xs text-red-400">{errors.name.message}</p>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-zinc-400">Amount</Label>
+                      <Input {...register("amount")} type="text" inputMode="decimal" placeholder="0.00" className="bg-zinc-950 border-white/10" />
+                      {errors.amount && <p className="text-xs text-red-400">{errors.amount.message}</p>}
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-zinc-400">Frequency</Label>
+                      <Select onValueChange={(v) => setValue("frequency", v as any)} defaultValue="MONTHLY">
+                        <SelectTrigger className="bg-zinc-950 border-white/10"><SelectValue /></SelectTrigger>
+                        <SelectContent className="bg-zinc-900 border-white/10">
+                          <SelectItem value="WEEKLY">Weekly</SelectItem>
+                          <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
+                          <SelectItem value="MONTHLY">Monthly</SelectItem>
+                          <SelectItem value="YEARLY">Yearly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-zinc-400">Start Date</Label>
+                      <Input {...register("startDate")} type="date" className="bg-zinc-950 border-white/10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-zinc-400">Account</Label>
+                      <Select onValueChange={(v) => setValue("accountId", String(v || ""))}>
+                        <SelectTrigger className="bg-zinc-950 border-white/10"><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent className="bg-zinc-900 border-white/10">
+                          {accounts?.map((a: any) => (
+                            <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.accountId && <p className="text-xs text-red-400">{errors.accountId.message}</p>}
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <Button type="button" variant="ghost" onClick={() => setShowAdd(false)}>Cancel</Button>
+                    <Button type="submit" className="bg-[#00d4aa] text-black font-semibold">Add Bill</Button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
