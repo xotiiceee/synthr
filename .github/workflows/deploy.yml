@@ -60,13 +60,13 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            set -e
             cd /opt/synthr
 
             echo "==> Stopping app..."
             pm2 stop synthr 2>/dev/null || true
 
-            echo "==> Backing up old build..."
+            echo "==> Removing old broken files..."
+            rm -f /opt/synthr/prisma.config.ts
             rm -rf .next/standalone-prev
             mv .next/standalone .next/standalone-prev 2>/dev/null || true
 
@@ -74,7 +74,7 @@ jobs:
             tar -xzf /tmp/deploy.tar.gz
 
             echo "==> Running database migrations..."
-            export DATABASE_URL="$(cat /opt/synthr/.env | grep DATABASE_URL | cut -d'"' -f2)" && npx prisma migrate deploy
+            export DATABASE_URL="$(cat /opt/synthr/.env | grep DATABASE_URL | cut -d'"' -f2)" && npx prisma migrate deploy --schema=./prisma/schema.prisma
 
             echo "==> Restarting app..."
             pm2 start ecosystem.config.js 2>/dev/null || pm2 reload synthr --update-env
