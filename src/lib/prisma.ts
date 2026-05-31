@@ -4,28 +4,22 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-let prisma: PrismaClient;
+let cachedPrisma: PrismaClient | undefined;
 
 function getPrisma(): PrismaClient {
   if (globalForPrisma.prisma) return globalForPrisma.prisma;
-  if (prisma) return prisma;
-
-  // Dynamic import at runtime only — never during build
-  const { PrismaClient: PC } = require("@prisma/client");
-  const client = new PC();
-  prisma = client;
-  globalForPrisma.prisma = client;
-  return client;
+  if (cachedPrisma) return cachedPrisma;
+  const { PrismaClient: PC } = require("@prisma/client") as { PrismaClient: typeof import("@prisma/client").PrismaClient };
+  cachedPrisma = new PC();
+  globalForPrisma.prisma = cachedPrisma;
+  return cachedPrisma;
 }
 
-export { getPrisma as prisma };
-
-// Proxy that traps calls to prisma methods
-const prismaProxy = new Proxy({} as unknown as PrismaClient, {
-  get(_target, prop) {
-    return (getPrisma() as any)[prop];
+export const prisma = new Proxy({} as unknown as PrismaClient, {
+  get(_target, prop: string | symbol) {
+    const client = getPrisma();
+    return (client as Record<string | symbol, unknown>)[prop];
   },
-});
+}) as PrismaClient;
 
-export { prismaProxy as prisma };
-export default prismaProxy;
+export default prisma;
