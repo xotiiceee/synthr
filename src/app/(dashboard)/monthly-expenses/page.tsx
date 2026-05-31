@@ -19,7 +19,7 @@ import { ChevronLeft, ChevronRight, TrendingDown, Receipt, Repeat, Clock, ArrowU
 
 const billSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  amount: z.coerce.number().positive("Must be positive"),
+  amount: z.string().min(1, "Amount is required"),
   frequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY", "YEARLY"]),
   accountId: z.string().min(1, "Account is required"),
   startDate: z.string().min(1, "Start date is required"),
@@ -63,7 +63,7 @@ export default function MonthlyExpensesPage() {
       const res = await fetch("/api/recurring", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, type: "EXPENSE" }),
+        body: JSON.stringify({ ...data, amount: parseFloat(data.amount), type: "EXPENSE" }),
       });
       if (!res.ok) throw new Error("Failed to add bill");
       return res.json();
@@ -222,7 +222,7 @@ export default function MonthlyExpensesPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-zinc-400">Amount</Label>
-                    <Input {...register("amount")} type="number" step="0.01" placeholder="0.00" className="bg-zinc-950 border-white/10" />
+                    <Input {...register("amount")} type="text" inputMode="decimal" placeholder="0.00" className="bg-zinc-950 border-white/10" />
                     {errors.amount && <p className="text-xs text-red-400">{errors.amount.message}</p>}
                   </div>
                   <div className="space-y-2">
@@ -245,7 +245,7 @@ export default function MonthlyExpensesPage() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-zinc-400">Account</Label>
-                    <Select onValueChange={(v) => setValue("accountId", v)}>
+                    <Select onValueChange={(v: string) => setValue("accountId", v)}>
                       <SelectTrigger className="bg-zinc-950 border-white/10"><SelectValue placeholder="Select" /></SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10">
                         {accounts?.map((a: any) => (
