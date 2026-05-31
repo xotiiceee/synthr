@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { TrendingUp, PiggyBank, Wallet, Receipt, BarChart3, Shield, ArrowRight, Sparkles } from "lucide-react";
+import { TrendingUp, PiggyBank, Wallet, Receipt, BarChart3, Shield, ArrowRight, Sparkles, Users, Zap, Layers } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
