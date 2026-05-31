@@ -38,6 +38,7 @@ jobs:
           tar -czf deploy.tar.gz \
             .next/standalone \
             prisma \
+            prisma.config.ts \
             package.json \
             package-lock.json \
             ecosystem.config.js \
