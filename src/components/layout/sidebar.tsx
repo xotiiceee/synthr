@@ -13,8 +13,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Bell,
   Landmark,
+  Circle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -38,18 +38,14 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 flex-col border-r border-border bg-card md:flex">
-      <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-        <svg width="28" height="28" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="120" height="120" rx="28" fill="#0f172a"/>
-          <path d="M30 38 L75 38" stroke="#00d4aa" strokeWidth="3.5" strokeLinecap="round"/>
-          <path d="M75 38 C95 38 95 60 75 60 L45 60" stroke="#00d4aa" strokeWidth="3.5" strokeLinecap="round"/>
-          <path d="M45 60 C25 60 25 82 45 82 L90 82" stroke="#00d4aa" strokeWidth="3.5" strokeLinecap="round"/>
-          <path d="M90 82 L82 76 M90 82 L82 88" stroke="#00d4aa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        <span className="text-xl font-bold tracking-tight">synthr</span>
+    <aside className="hidden w-[240px] flex-col border-r border-white/5 bg-zinc-950 md:flex">
+      <div className="flex items-center gap-2.5 px-5 py-4">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00d4aa]/10">
+          <Circle className="h-3.5 w-3.5 fill-[#00d4aa] text-[#00d4aa]" />
+        </div>
+        <span className="text-lg font-bold tracking-tight">synthr</span>
       </div>
-      <nav className="flex-1 space-y-1 p-4">
+      <nav className="flex-1 space-y-0.5 px-3 py-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
@@ -59,21 +55,24 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  ? "bg-zinc-800 text-white"
+                  : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white"
               )}
             >
-              <item.icon className="h-4 w-4" />
+              <item.icon className="h-4 w-4 shrink-0" />
               {item.label}
             </Link>
           );
         })}
       </nav>
-      <div className="border-t border-border p-4">
-        <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground" onClick={() => signOut({ callbackUrl: "/auth/signin" })}>
-          <LogOut className="h-4 w-4" />
+      <div className="border-t border-white/5 px-3 py-3">
+        <button
+          onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-800/50 hover:text-white"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
           Sign out
-        </Button>
+        </button>
       </div>
     </aside>
   );
@@ -85,15 +84,18 @@ export function MobileNav() {
   return (
     <Sheet>
       <SheetTrigger>
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button variant="ghost" size="icon" className="md:hidden text-zinc-400 hover:text-white">
           <LayoutDashboard className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-64 bg-card p-0">
-        <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-          <span className="text-xl font-bold tracking-tight">synthr</span>
+      <SheetContent side="left" className="w-[240px] border-r border-white/5 bg-zinc-950 p-0">
+        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-white/5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00d4aa]/10">
+            <Circle className="h-3.5 w-3.5 fill-[#00d4aa] text-[#00d4aa]" />
+          </div>
+          <span className="text-lg font-bold tracking-tight">synthr</span>
         </div>
-        <nav className="space-y-1 p-4">
+        <nav className="space-y-0.5 p-3">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -103,11 +105,11 @@ export function MobileNav() {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "bg-zinc-800 text-white"
+                    : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white"
                 )}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className="h-4 w-4 shrink-0" />
                 {item.label}
               </Link>
             );
@@ -120,12 +122,12 @@ export function MobileNav() {
 
 export function DashboardHeader() {
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-6">
+    <header className="flex h-14 items-center justify-between border-b border-white/5 bg-zinc-950 px-4 md:px-6">
       <div className="flex items-center gap-4">
         <MobileNav />
-        <h1 className="text-lg font-semibold md:text-xl">Dashboard</h1>
+        <h1 className="text-sm font-semibold tracking-tight text-white">Dashboard</h1>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <NotificationsBell />
       </div>
     </header>

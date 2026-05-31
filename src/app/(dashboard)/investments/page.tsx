@@ -67,7 +67,7 @@ interface Account {
 
 const COLORS = ["#00d4aa", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#6366f1"];
 
-const glassCard = "relative overflow-hidden border-0 bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10";
+const glassCard = "relative overflow-hidden border border-white/5 bg-zinc-900 rounded-xl";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -224,14 +224,14 @@ export default function InvestmentsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-100">Investments</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Investments</h1>
           {summary && (
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-zinc-400">
               Portfolio value {formatCurrency(summary.totalMarketValue)}
             </p>
           )}
         </div>
-        <Button onClick={openAddDialog} className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90">
+        <Button onClick={openAddDialog} className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90">
           <Plus className="mr-2 h-4 w-4" />
           Add Holding
         </Button>
@@ -243,7 +243,7 @@ export default function InvestmentsPage() {
           <Card className={cn(glassCard)}>
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#00d4aa]/10 blur-2xl" />
             <CardHeader className="relative pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Total Market Value</CardTitle>
+              <CardTitle className="text-sm font-medium text-zinc-400">Total Market Value</CardTitle>
             </CardHeader>
             <CardContent className="relative">
               <div className="text-2xl font-bold text-[#00d4aa]">{formatCurrency(summary.totalMarketValue)}</div>
@@ -253,7 +253,7 @@ export default function InvestmentsPage() {
           <Card className={cn(glassCard)}>
             <div className={cn("absolute -right-6 -top-6 h-24 w-24 rounded-full blur-2xl", summary.totalUnrealizedGain >= 0 ? "bg-emerald-500/10" : "bg-rose-500/10")} />
             <CardHeader className="relative pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Total Unrealized Gain/Loss</CardTitle>
+              <CardTitle className="text-sm font-medium text-zinc-400">Total Unrealized Gain/Loss</CardTitle>
             </CardHeader>
             <CardContent className="relative">
               <div className="flex items-center gap-2">
@@ -273,12 +273,12 @@ export default function InvestmentsPage() {
           </Card>
 
           <Card className={cn(glassCard)}>
-            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-slate-400/10 blur-2xl" />
+            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-zinc-700/50 blur-2xl" />
             <CardHeader className="relative pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Total Cost Basis</CardTitle>
+              <CardTitle className="text-sm font-medium text-zinc-400">Total Cost Basis</CardTitle>
             </CardHeader>
             <CardContent className="relative">
-              <div className="text-2xl font-bold text-slate-200">{formatCurrency(summary.totalCostBasis)}</div>
+              <div className="text-2xl font-bold text-zinc-200">{formatCurrency(summary.totalCostBasis)}</div>
             </CardContent>
           </Card>
         </div>
@@ -288,7 +288,7 @@ export default function InvestmentsPage() {
       {holdings.length > 0 && (
         <Card className={cn(glassCard)}>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-200">
+            <CardTitle className="flex items-center gap-2 text-zinc-200">
               <PieChartIcon className="h-5 w-5 text-[#00d4aa]" />
               Portfolio Allocation
             </CardTitle>
@@ -312,7 +312,7 @@ export default function InvestmentsPage() {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
+                  contentStyle={{ backgroundColor: "#18181b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
                   formatter={(value: any) => formatCurrency(Number(value))}
                 />
                 <Legend wrapperStyle={{ color: "#94a3b8" }} />
@@ -325,19 +325,19 @@ export default function InvestmentsPage() {
       {/* Holdings Table */}
       <Card className={cn(glassCard)}>
         <CardHeader>
-          <CardTitle className="text-slate-200">Holdings</CardTitle>
+          <CardTitle className="text-zinc-200">Holdings</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="py-12 text-center text-slate-400">Loading holdings...</div>
+            <div className="py-12 text-center text-zinc-400">Loading holdings...</div>
           ) : holdings.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Briefcase className="mb-4 h-12 w-12 text-slate-500" />
-              <h3 className="text-lg font-semibold text-slate-200">No holdings yet</h3>
-              <p className="mb-6 mt-1 max-w-sm text-sm text-slate-400">
+              <Briefcase className="mb-4 h-12 w-12 text-zinc-500" />
+              <h3 className="text-lg font-semibold text-zinc-200">No holdings yet</h3>
+              <p className="mb-6 mt-1 max-w-sm text-sm text-zinc-400">
                 Add your first investment to start tracking your portfolio performance.
               </p>
-              <Button onClick={openAddDialog} className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90">
+              <Button onClick={openAddDialog} className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90">
                 <Plus className="mr-2 h-4 w-4" />
                 Add your first holding
               </Button>
@@ -347,10 +347,10 @@ export default function InvestmentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/5 hover:bg-transparent">
-                    <TableHead className="text-slate-400">Symbol</TableHead>
-                    <TableHead className="text-slate-400">Quantity</TableHead>
-                    <TableHead className="text-slate-400">Avg Cost</TableHead>
-                    <TableHead className="text-slate-400">
+                    <TableHead className="text-zinc-400">Symbol</TableHead>
+                    <TableHead className="text-zinc-400">Quantity</TableHead>
+                    <TableHead className="text-zinc-400">Avg Cost</TableHead>
+                    <TableHead className="text-zinc-400">
                       <div className="flex items-center gap-2">
                         Live Price
                         <Button
@@ -358,26 +358,26 @@ export default function InvestmentsPage() {
                           size="icon-xs"
                           onClick={handleRefresh}
                           disabled={refreshing}
-                          className="h-6 w-6 text-slate-400 hover:text-slate-200"
+                          className="h-6 w-6 text-zinc-400 hover:text-zinc-200"
                         >
                           <RefreshCw className={cn("h-3 w-3", refreshing && "animate-spin")} />
                         </Button>
                       </div>
                     </TableHead>
-                    <TableHead className="text-slate-400">Market Value</TableHead>
-                    <TableHead className="text-slate-400">Gain/Loss</TableHead>
-                    <TableHead className="text-slate-400">Gain/Loss %</TableHead>
-                    <TableHead className="text-right text-slate-400">Actions</TableHead>
+                    <TableHead className="text-zinc-400">Market Value</TableHead>
+                    <TableHead className="text-zinc-400">Gain/Loss</TableHead>
+                    <TableHead className="text-zinc-400">Gain/Loss %</TableHead>
+                    <TableHead className="text-right text-zinc-400">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {holdings.map((h) => (
                     <TableRow key={h.id} className="border-white/5">
-                      <TableCell className="font-bold text-slate-200">{h.symbol}</TableCell>
-                      <TableCell className="text-slate-300">{h.quantity.toFixed(4)}</TableCell>
-                      <TableCell className="text-slate-300">{formatCurrency(h.avgCost)}</TableCell>
-                      <TableCell className="text-slate-300">{formatCurrency(h.livePrice)}</TableCell>
-                      <TableCell className="font-medium text-slate-200">{formatCurrency(h.marketValue)}</TableCell>
+                      <TableCell className="font-bold text-zinc-200">{h.symbol}</TableCell>
+                      <TableCell className="text-zinc-300">{h.quantity.toFixed(4)}</TableCell>
+                      <TableCell className="text-zinc-300">{formatCurrency(h.avgCost)}</TableCell>
+                      <TableCell className="text-zinc-300">{formatCurrency(h.livePrice)}</TableCell>
+                      <TableCell className="font-medium text-zinc-200">{formatCurrency(h.marketValue)}</TableCell>
                       <TableCell className={cn("font-medium", h.unrealizedGain >= 0 ? "text-emerald-400" : "text-rose-400")}>
                         {formatCurrency(h.unrealizedGain)}
                       </TableCell>
@@ -390,14 +390,14 @@ export default function InvestmentsPage() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() => openEditDialog(h)}
-                            className="text-slate-400 hover:text-slate-200"
+                            className="text-zinc-400 hover:text-zinc-200"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            className="text-slate-400 hover:text-rose-400"
+                            className="text-zinc-400 hover:text-rose-400"
                             onClick={() => deleteMutation.mutate(h.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -415,37 +415,37 @@ export default function InvestmentsPage() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="border-0 bg-zinc-900 border border-white/5">
           <DialogHeader>
-            <DialogTitle className="text-slate-100">{editingHolding ? "Edit Holding" : "Add Holding"}</DialogTitle>
+            <DialogTitle className="text-white">{editingHolding ? "Edit Holding" : "Add Holding"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             {!editingHolding && (
               <div className="space-y-2">
-                <Label htmlFor="symbol" className="text-slate-300">Symbol</Label>
+                <Label htmlFor="symbol" className="text-zinc-300">Symbol</Label>
                 <Input
                   id="symbol"
                   value={form.symbol}
                   onChange={(e) => setForm({ ...form, symbol: e.target.value })}
                   placeholder="AAPL"
                   required
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-800 border border-white/5"
                 />
               </div>
             )}
             {!editingHolding && (
               <div className="space-y-2">
-                <Label htmlFor="account" className="text-slate-300">Account</Label>
+                <Label htmlFor="account" className="text-zinc-300">Account</Label>
                 <Select
                   value={form.accountId}
                   onValueChange={(value: string | null) => setForm({ ...form, accountId: value ?? "" })}
                 >
-                  <SelectTrigger className="bg-slate-800 ring-1 ring-white/10">
+                  <SelectTrigger className="bg-zinc-800 border border-white/5">
                     <SelectValue placeholder="Select account" />
                   </SelectTrigger>
-                  <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
+                  <SelectContent className="border-0 bg-zinc-800 border border-white/5">
                     {accounts?.map((acc) => (
-                      <SelectItem key={acc.id} value={acc.id} className="focus:bg-slate-700">
+                      <SelectItem key={acc.id} value={acc.id} className="focus:bg-zinc-700">
                         {acc.name}
                       </SelectItem>
                     ))}
@@ -454,7 +454,7 @@ export default function InvestmentsPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="quantity" className="text-slate-300">Quantity</Label>
+              <Label htmlFor="quantity" className="text-zinc-300">Quantity</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -463,11 +463,11 @@ export default function InvestmentsPage() {
                 onChange={(e) => setForm({ ...form, quantity: e.target.value })}
                 placeholder="10"
                 required
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="avgCost" className="text-slate-300">Average Cost</Label>
+              <Label htmlFor="avgCost" className="text-zinc-300">Average Cost</Label>
               <Input
                 id="avgCost"
                 type="number"
@@ -476,14 +476,14 @@ export default function InvestmentsPage() {
                 onChange={(e) => setForm({ ...form, avgCost: e.target.value })}
                 placeholder="150.00"
                 required
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
             </div>
             <DialogFooter>
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
               >
                 {editingHolding ? "Save Changes" : "Add Holding"}
               </Button>

@@ -183,7 +183,7 @@ async function fetchAdvisor(): Promise<AdvisorData> {
 
 // ─── Visual helpers ──────────────────────────────────────
 const glassCard =
-  "relative overflow-hidden border-0 bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10";
+  "relative overflow-hidden border border-white/5 bg-zinc-900 rounded-xl";
 
 function StatusGauge({
   status,
@@ -240,7 +240,7 @@ function StatusGauge({
           >
             {formatPercent(actualRate)}
           </span>
-          <span className="text-[10px] uppercase tracking-wider text-slate-500">
+          <span className="text-[10px] uppercase tracking-wider text-zinc-500">
             Actual Rate
           </span>
         </div>
@@ -600,14 +600,14 @@ export default function SavingsAdvisorPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-white">
             Savings Advisor
           </h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-zinc-400">
             Smart recommendations to maximize your savings
           </p>
         </div>
         <Button
           variant="outline"
           onClick={openSettings}
-          className="border-white/10 bg-slate-800/50 text-slate-200 hover:bg-white/5 hover:text-white"
+          className="border-white/5 bg-zinc-800/50 text-white hover:bg-white/5 hover:text-white"
         >
           <Settings className="mr-2 h-4 w-4" />
           Settings
@@ -615,22 +615,22 @@ export default function SavingsAdvisorPage() {
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 ring-1 ring-white/10 md:w-auto">
+        <TabsList className="grid w-full grid-cols-3 bg-zinc-800/50 border border-white/5 md:w-auto">
           <TabsTrigger
             value="advisor"
-            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-slate-900"
+            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-black"
           >
             Advisor
           </TabsTrigger>
           <TabsTrigger
             value="goals"
-            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-slate-900"
+            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-black"
           >
             Goals
           </TabsTrigger>
           <TabsTrigger
             value="debts"
-            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-slate-900"
+            className="data-[state=active]:bg-[#00d4aa] data-[state=active]:text-black"
           >
             Debts
           </TabsTrigger>
@@ -642,17 +642,17 @@ export default function SavingsAdvisorPage() {
           <Card className={cn(glassCard)}>
             <CardContent className="flex flex-col items-center gap-6 py-8 md:flex-row md:justify-between md:px-8">
               <div className="flex flex-col items-center gap-2 md:items-start">
-                <div className="text-sm font-medium text-slate-400">
+                <div className="text-sm font-medium text-zinc-400">
                   Savings Health
                 </div>
                 <div className="text-3xl font-bold text-white">
                   {advisor?.status ?? "Loading…"}
                 </div>
-                <div className="mt-1 flex items-center gap-2 text-sm text-slate-400">
+                <div className="mt-1 flex items-center gap-2 text-sm text-zinc-400">
                   <Target className="h-4 w-4 text-[#00d4aa]" />
                   Target: {advisor ? formatPercent(advisor.targetRate ?? 0.2) : "20%"}
                 </div>
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-xs text-zinc-500">
                   Based on your income and expense patterns
                 </div>
               </div>
@@ -671,7 +671,7 @@ export default function SavingsAdvisorPage() {
             <Card className={cn(glassCard, "border-t-2 border-t-teal-500")}>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-slate-300">
+                  <CardTitle className="text-sm font-medium text-zinc-300">
                     Average Income
                   </CardTitle>
                   <div className="rounded-lg bg-teal-500/10 p-2">
@@ -683,7 +683,7 @@ export default function SavingsAdvisorPage() {
                 <div className="text-2xl font-bold tracking-tight text-white">
                   {advisor ? formatCurrency(advisor.avgIncome) : "—"}
                 </div>
-                <div className="mt-1 flex items-center gap-1 text-xs text-slate-500">
+                <div className="mt-1 flex items-center gap-1 text-xs text-zinc-500">
                   per {advisor?.incomeFrequency.toLowerCase() ?? "month"}
                 </div>
               </CardContent>
@@ -692,7 +692,7 @@ export default function SavingsAdvisorPage() {
             <Card className={cn(glassCard, "border-t-2 border-t-rose-500")}>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-slate-300">
+                  <CardTitle className="text-sm font-medium text-zinc-300">
                     Fixed Expenses
                   </CardTitle>
                   <div className="rounded-lg bg-rose-500/10 p-2">
@@ -704,7 +704,7 @@ export default function SavingsAdvisorPage() {
                 <div className="text-2xl font-bold tracking-tight text-white">
                   {advisor ? formatCurrency(advisor.fixedExpenses) : "—"}
                 </div>
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-xs text-zinc-500">
                   Including minimum debt payments
                 </div>
               </CardContent>
@@ -713,7 +713,7 @@ export default function SavingsAdvisorPage() {
             <Card className={cn(glassCard, "border-t-2 border-t-[#00d4aa]")}>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-slate-300">
+                  <CardTitle className="text-sm font-medium text-zinc-300">
                     Recommended Savings
                   </CardTitle>
                   <div className="rounded-lg bg-[#00d4aa]/10 p-2">
@@ -725,7 +725,7 @@ export default function SavingsAdvisorPage() {
                 <div className="text-2xl font-bold tracking-tight text-white">
                   {advisor ? formatCurrency(advisor.recommendedSavings) : "—"}
                 </div>
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-xs text-zinc-500">
                   Target rate applied to income
                 </div>
               </CardContent>
@@ -734,7 +734,7 @@ export default function SavingsAdvisorPage() {
             <Card className={cn(glassCard, "border-t-2 border-t-emerald-500")}>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-slate-300">
+                  <CardTitle className="text-sm font-medium text-zinc-300">
                     Safe to Spend
                   </CardTitle>
                   <div className="rounded-lg bg-emerald-500/10 p-2">
@@ -746,7 +746,7 @@ export default function SavingsAdvisorPage() {
                 <div className="text-2xl font-bold tracking-tight text-white">
                   {advisor ? formatCurrency(advisor.safeToSpend) : "—"}
                 </div>
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-xs text-zinc-500">
                   After savings and fixed costs
                 </div>
               </CardContent>
@@ -769,8 +769,8 @@ export default function SavingsAdvisorPage() {
             <CardContent className="space-y-6">
               {advisor && (
                 <>
-                  <div className="rounded-xl bg-slate-900/60 p-4 ring-1 ring-white/5">
-                    <p className="text-sm leading-relaxed text-slate-300">
+                  <div className="rounded-xl bg-zinc-900/60 p-4 ring-1 ring-white/5">
+                    <p className="text-sm leading-relaxed text-zinc-300">
                       Based on your income and expenses, you can safely save{" "}
                       <span className="font-semibold text-[#00d4aa]">
                         {formatCurrency(advisor.recommendedSavings)}
@@ -822,7 +822,7 @@ export default function SavingsAdvisorPage() {
                         {allocationData.map((item, idx) => (
                           <div
                             key={item.name}
-                            className="flex items-center justify-between rounded-lg bg-slate-900/40 p-3 ring-1 ring-white/5"
+                            className="flex items-center justify-between rounded-lg bg-zinc-900/40 p-3 ring-1 ring-white/5"
                           >
                             <div className="flex items-center gap-3">
                               <span
@@ -832,7 +832,7 @@ export default function SavingsAdvisorPage() {
                                     COLORS[idx % COLORS.length],
                                 }}
                               />
-                              <span className="text-sm text-slate-300">
+                              <span className="text-sm text-zinc-300">
                                 {item.name}
                               </span>
                             </div>
@@ -864,7 +864,7 @@ export default function SavingsAdvisorPage() {
                 <>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">Progress</span>
+                      <span className="text-zinc-400">Progress</span>
                       <span className="font-medium text-white">
                         {formatPercent(advisor.actualSavingsRate)}
                       </span>
@@ -873,7 +873,7 @@ export default function SavingsAdvisorPage() {
                       value={Math.min(advisor.actualSavingsRate * 100, 100)}
                       className="w-full"
                     >
-                      <ProgressTrack className="h-2.5 bg-slate-700/50">
+                      <ProgressTrack className="h-2.5 bg-zinc-700/50">
                         <ProgressIndicator
                           className={cn(
                             "rounded-full",
@@ -887,7 +887,7 @@ export default function SavingsAdvisorPage() {
                       </ProgressTrack>
                     </Progress>
                   </div>
-                  <div className="flex justify-between text-sm text-slate-500">
+                  <div className="flex justify-between text-sm text-zinc-500">
                     <span>0%</span>
                     <span>Target: {advisor ? formatPercent(advisor.targetRate ?? 0.2) : "20%"}</span>
                     <span>100%</span>
@@ -916,22 +916,22 @@ export default function SavingsAdvisorPage() {
                   {advisor.payoffOrder.map((d, idx) => (
                     <div
                       key={d.id}
-                      className="flex items-start justify-between rounded-xl bg-slate-900/40 p-4 ring-1 ring-white/5 transition-colors hover:bg-slate-900/60"
+                      className="flex items-start justify-between rounded-xl bg-zinc-900/40 p-4 ring-1 ring-white/5 transition-colors hover:bg-zinc-900/60"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-slate-300">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700 text-xs font-bold text-zinc-300">
                             {idx + 1}
                           </span>
                           <span className="font-medium text-white">{d.name}</span>
                           <Badge
                             variant="outline"
-                            className="border-white/10 text-[10px] capitalize text-slate-400"
+                            className="border-white/5 text-[10px] capitalize text-zinc-400"
                           >
                             {d.payoffStrategy.toLowerCase()}
                           </Badge>
                         </div>
-                        <div className="pl-8 text-xs text-slate-500">
+                        <div className="pl-8 text-xs text-zinc-500">
                           APR {d.apr}% · Min {formatCurrency(d.minimumPayment)}
                         </div>
                       </div>
@@ -939,7 +939,7 @@ export default function SavingsAdvisorPage() {
                         <div className="font-medium text-white">
                           {formatCurrency(d.balance)}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-zinc-500">
                           {d.estimatedPayoffDate
                             ? `Payoff ${format(new Date(d.estimatedPayoffDate), "MMM yyyy")}`
                             : "Never at minimum"}
@@ -959,7 +959,7 @@ export default function SavingsAdvisorPage() {
             <h2 className="text-lg font-semibold text-white">Savings Goals</h2>
             <Button
               onClick={openGoalCreate}
-              className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
             >
               <Plus className="mr-2 h-4 w-4" />
               New Goal
@@ -969,15 +969,15 @@ export default function SavingsAdvisorPage() {
           {goalsLoading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Card key={i} className={cn(glassCard, "h-48 animate-pulse bg-slate-800/30")} />
+                <Card key={i} className={cn(glassCard, "h-48 animate-pulse bg-zinc-800/30")} />
               ))}
             </div>
           ) : goals.length === 0 ? (
             <Card className={cn(glassCard, "py-12")}>
-              <CardContent className="text-center text-muted-foreground">
-                <Target className="mx-auto mb-3 h-8 w-8 text-slate-500" />
+              <CardContent className="text-center text-zinc-400">
+                <Target className="mx-auto mb-3 h-8 w-8 text-zinc-500" />
                 <p className="text-white">No savings goals yet.</p>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-zinc-400">
                   Create one to get started.
                 </p>
               </CardContent>
@@ -1012,7 +1012,7 @@ export default function SavingsAdvisorPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-slate-400 hover:text-white"
+                            className="h-8 w-8 text-zinc-400 hover:text-white"
                             onClick={() => openGoalEdit(goal)}
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -1020,7 +1020,7 @@ export default function SavingsAdvisorPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-slate-400 hover:text-red-400"
+                            className="h-8 w-8 text-zinc-400 hover:text-red-400"
                             onClick={() => deleteGoal.mutate(goal.id)}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -1031,17 +1031,17 @@ export default function SavingsAdvisorPage() {
                     <CardContent className="flex-1 space-y-3">
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-400">Progress</span>
+                          <span className="text-zinc-400">Progress</span>
                           <span className="font-medium text-white">{pct}%</span>
                         </div>
                         <Progress value={pct} className="w-full">
-                          <ProgressTrack className="h-2 bg-slate-700/50">
+                          <ProgressTrack className="h-2 bg-zinc-700/50">
                             <ProgressIndicator className="rounded-full bg-[#00d4aa]" />
                           </ProgressTrack>
                         </Progress>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-400">
+                        <span className="text-zinc-400">
                           {formatCurrency(goal.currentAmount)}
                         </span>
                         <span className="font-medium text-white">
@@ -1049,10 +1049,10 @@ export default function SavingsAdvisorPage() {
                         </span>
                       </div>
                     </CardContent>
-                    <CardFooter className="border-t border-white/5 bg-slate-900/30">
+                    <CardFooter className="border-t border-white/5 bg-zinc-900/30">
                       <Button
                         variant="secondary"
-                        className="w-full bg-slate-700/40 text-white hover:bg-slate-700/60"
+                        className="w-full bg-zinc-700/40 text-white hover:bg-zinc-700/60"
                         onClick={() => {
                           setContributeGoalId(goal.id);
                           contributeForm.reset({ amount: 0 });
@@ -1075,7 +1075,7 @@ export default function SavingsAdvisorPage() {
             <h2 className="text-lg font-semibold text-white">Debt Tracking</h2>
             <Button
               onClick={openDebtCreate}
-              className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
             >
               <Plus className="mr-2 h-4 w-4" />
               New Debt
@@ -1085,15 +1085,15 @@ export default function SavingsAdvisorPage() {
           {debtsLoading ? (
             <div className="space-y-4">
               {Array.from({ length: 2 }).map((_, i) => (
-                <Card key={i} className={cn(glassCard, "h-28 animate-pulse bg-slate-800/30")} />
+                <Card key={i} className={cn(glassCard, "h-28 animate-pulse bg-zinc-800/30")} />
               ))}
             </div>
           ) : debts.length === 0 ? (
             <Card className={cn(glassCard, "py-12")}>
-              <CardContent className="text-center text-muted-foreground">
-                <CreditCard className="mx-auto mb-3 h-8 w-8 text-slate-500" />
+              <CardContent className="text-center text-zinc-400">
+                <CreditCard className="mx-auto mb-3 h-8 w-8 text-zinc-500" />
                 <p className="text-white">No debts tracked yet.</p>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-zinc-400">
                   Add one to see payoff recommendations.
                 </p>
               </CardContent>
@@ -1107,24 +1107,24 @@ export default function SavingsAdvisorPage() {
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <CreditCard className="h-4 w-4 text-slate-400" />
+                            <CreditCard className="h-4 w-4 text-zinc-400" />
                             <span className="font-medium text-white">
                               {debt.name}
                             </span>
                             <Badge
                               variant="outline"
-                              className="border-white/10 text-[10px] capitalize text-slate-400"
+                              className="border-white/5 text-[10px] capitalize text-zinc-400"
                             >
                               {debt.type}
                             </Badge>
                             <Badge
                               variant="secondary"
-                              className="bg-slate-700/40 text-[10px] text-slate-300"
+                              className="bg-zinc-700/40 text-[10px] text-zinc-300"
                             >
                               {debt.payoffStrategy}
                             </Badge>
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-zinc-500">
                             APR {debt.apr}% · Minimum{" "}
                             {formatCurrency(debt.minimumPayment)}
                           </div>
@@ -1134,7 +1134,7 @@ export default function SavingsAdvisorPage() {
                             <div className="font-semibold text-white">
                               {formatCurrency(debt.balance)}
                             </div>
-                            <div className="text-xs text-slate-500">
+                            <div className="text-xs text-zinc-500">
                               Balance
                             </div>
                           </div>
@@ -1142,7 +1142,7 @@ export default function SavingsAdvisorPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-slate-400 hover:text-white"
+                              className="h-8 w-8 text-zinc-400 hover:text-white"
                               onClick={() => openDebtEdit(debt)}
                             >
                               <Pencil className="h-3.5 w-3.5" />
@@ -1150,7 +1150,7 @@ export default function SavingsAdvisorPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-slate-400 hover:text-red-400"
+                              className="h-8 w-8 text-zinc-400 hover:text-red-400"
                               onClick={() => deleteDebt.mutate(debt.id)}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -1162,7 +1162,7 @@ export default function SavingsAdvisorPage() {
                         <Button
                           variant="secondary"
                           size="sm"
-                          className="bg-slate-700/40 text-white hover:bg-slate-700/60"
+                          className="bg-zinc-700/40 text-white hover:bg-zinc-700/60"
                           onClick={() => {
                             setPaymentDebtId(debt.id);
                             paymentForm.reset({ amount: 0 });
@@ -1192,17 +1192,17 @@ export default function SavingsAdvisorPage() {
                       {advisor.payoffOrder.map((d, idx) => (
                         <div
                           key={d.id}
-                          className="flex items-center justify-between rounded-xl bg-slate-900/40 p-4 ring-1 ring-white/5 transition-colors hover:bg-slate-900/60"
+                          className="flex items-center justify-between rounded-xl bg-zinc-900/40 p-4 ring-1 ring-white/5 transition-colors hover:bg-zinc-900/60"
                         >
                           <div className="flex items-center gap-3">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-slate-300">
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700 text-xs font-bold text-zinc-300">
                               {idx + 1}
                             </span>
                             <div>
                               <div className="font-medium text-white">
                                 {d.name}
                               </div>
-                              <div className="text-xs text-slate-500">
+                              <div className="text-xs text-zinc-500">
                                 {d.estimatedPayoffDate
                                   ? `Estimated payoff ${format(new Date(d.estimatedPayoffDate), "MMM yyyy")}`
                                   : "Cannot payoff at minimum rate"}
@@ -1213,7 +1213,7 @@ export default function SavingsAdvisorPage() {
                             <div className="text-white">
                               {formatCurrency(d.balance)}
                             </div>
-                            <div className="text-xs text-slate-500">
+                            <div className="text-xs text-zinc-500">
                               {d.apr}% APR
                             </div>
                           </div>
@@ -1230,7 +1230,7 @@ export default function SavingsAdvisorPage() {
 
       {/* ─── Goal Dialog ────────────────────────────────── */}
       <Dialog open={goalDialogOpen} onOpenChange={setGoalDialogOpen}>
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="border border-white/5 bg-zinc-900">
           <DialogHeader>
             <DialogTitle className="text-white">
               {editingGoal ? "Edit Goal" : "New Savings Goal"}
@@ -1250,7 +1250,7 @@ export default function SavingsAdvisorPage() {
               <Input
                 id="g-name"
                 {...goalForm.register("name")}
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
               {goalForm.formState.errors.name && (
                 <p className="text-xs text-destructive">
@@ -1266,7 +1266,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...goalForm.register("targetAmount")}
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-800 border border-white/5"
                 />
                 {goalForm.formState.errors.targetAmount && (
                   <p className="text-xs text-destructive">
@@ -1281,7 +1281,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...goalForm.register("currentAmount")}
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-800 border border-white/5"
                 />
               </div>
             </div>
@@ -1292,7 +1292,7 @@ export default function SavingsAdvisorPage() {
                   id="g-deadline"
                   type="date"
                   {...goalForm.register("deadline")}
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-800 border border-white/5"
                 />
               </div>
               <div className="space-y-1">
@@ -1303,7 +1303,7 @@ export default function SavingsAdvisorPage() {
                   min={1}
                   max={5}
                   {...goalForm.register("priority")}
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-800 border border-white/5"
                 />
                 {goalForm.formState.errors.priority && (
                   <p className="text-xs text-destructive">
@@ -1315,7 +1315,7 @@ export default function SavingsAdvisorPage() {
             <DialogFooter>
               <Button
                 type="submit"
-                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
               >
                 {editingGoal ? "Save Changes" : "Create Goal"}
               </Button>
@@ -1334,7 +1334,7 @@ export default function SavingsAdvisorPage() {
           }
         }}
       >
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="border border-white/5 bg-zinc-900">
           <DialogHeader>
             <DialogTitle className="text-white">Contribute to Goal</DialogTitle>
             <DialogDescription>
@@ -1352,7 +1352,7 @@ export default function SavingsAdvisorPage() {
                 type="number"
                 step="0.01"
                 {...contributeForm.register("amount")}
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
               {contributeForm.formState.errors.amount && (
                 <p className="text-xs text-destructive">
@@ -1363,7 +1363,7 @@ export default function SavingsAdvisorPage() {
             <DialogFooter>
               <Button
                 type="submit"
-                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
               >
                 Contribute
               </Button>
@@ -1374,7 +1374,7 @@ export default function SavingsAdvisorPage() {
 
       {/* ─── Debt Dialog ────────────────────────────────── */}
       <Dialog open={debtDialogOpen} onOpenChange={setDebtDialogOpen}>
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="border border-white/5 bg-zinc-900">
           <DialogHeader>
             <DialogTitle className="text-white">
               {editingDebt ? "Edit Debt" : "New Debt"}
@@ -1394,7 +1394,7 @@ export default function SavingsAdvisorPage() {
               <Input
                 id="d-name"
                 {...debtForm.register("name")}
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
               {debtForm.formState.errors.name && (
                 <p className="text-xs text-destructive">
@@ -1408,7 +1408,7 @@ export default function SavingsAdvisorPage() {
                 id="d-type"
                 placeholder="e.g. credit_card, student_loan"
                 {...debtForm.register("type")}
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
               {debtForm.formState.errors.type && (
                 <p className="text-xs text-destructive">
@@ -1424,7 +1424,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...debtForm.register("balance")}
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-800 border border-white/5"
                 />
               </div>
               <div className="space-y-1">
@@ -1434,7 +1434,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...debtForm.register("apr")}
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-800 border border-white/5"
                 />
               </div>
             </div>
@@ -1446,7 +1446,7 @@ export default function SavingsAdvisorPage() {
                   type="number"
                   step="0.01"
                   {...debtForm.register("minimumPayment")}
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-800 border border-white/5"
                 />
                 {debtForm.formState.errors.minimumPayment && (
                   <p className="text-xs text-destructive">
@@ -1463,20 +1463,20 @@ export default function SavingsAdvisorPage() {
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger
                         id="d-strategy"
-                        className="bg-slate-800 ring-1 ring-white/10"
+                        className="bg-zinc-800 border border-white/5"
                       >
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
+                      <SelectContent className="border border-white/5 bg-zinc-800">
                         <SelectItem
                           value="AVALANCHE"
-                          className="focus:bg-slate-700"
+                          className="focus:bg-zinc-700"
                         >
                           Avalanche
                         </SelectItem>
                         <SelectItem
                           value="SNOWBALL"
-                          className="focus:bg-slate-700"
+                          className="focus:bg-zinc-700"
                         >
                           Snowball
                         </SelectItem>
@@ -1489,7 +1489,7 @@ export default function SavingsAdvisorPage() {
             <DialogFooter>
               <Button
                 type="submit"
-                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
               >
                 {editingDebt ? "Save Changes" : "Create Debt"}
               </Button>
@@ -1508,7 +1508,7 @@ export default function SavingsAdvisorPage() {
           }
         }}
       >
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="border border-white/5 bg-zinc-900">
           <DialogHeader>
             <DialogTitle className="text-white">Record Extra Payment</DialogTitle>
             <DialogDescription>
@@ -1526,7 +1526,7 @@ export default function SavingsAdvisorPage() {
                 type="number"
                 step="0.01"
                 {...paymentForm.register("amount")}
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
               {paymentForm.formState.errors.amount && (
                 <p className="text-xs text-destructive">
@@ -1537,7 +1537,7 @@ export default function SavingsAdvisorPage() {
             <DialogFooter>
               <Button
                 type="submit"
-                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
               >
                 Record Payment
               </Button>
@@ -1548,7 +1548,7 @@ export default function SavingsAdvisorPage() {
 
       {/* ─── Settings Dialog ────────────────────────────── */}
       <Dialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen}>
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="border border-white/5 bg-zinc-900">
           <DialogHeader>
             <DialogTitle className="text-white">Advisor Settings</DialogTitle>
             <DialogDescription>
@@ -1568,11 +1568,11 @@ export default function SavingsAdvisorPage() {
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger
                       id="s-freq"
-                      className="bg-slate-800 ring-1 ring-white/10"
+                      className="bg-zinc-800 border border-white/5"
                     >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
+                    <SelectContent className="border border-white/5 bg-zinc-800">
                       {[
                         "DAILY",
                         "WEEKLY",
@@ -1583,7 +1583,7 @@ export default function SavingsAdvisorPage() {
                         <SelectItem
                           key={f}
                           value={f}
-                          className="focus:bg-slate-700"
+                          className="focus:bg-zinc-700"
                         >
                           {f.charAt(0) + f.slice(1).toLowerCase()}
                         </SelectItem>
@@ -1602,7 +1602,7 @@ export default function SavingsAdvisorPage() {
                 min={0}
                 max={1}
                 {...settingsForm.register("targetRate")}
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
               {settingsForm.formState.errors.targetRate && (
                 <p className="text-xs text-destructive">
@@ -1618,16 +1618,16 @@ export default function SavingsAdvisorPage() {
                 step="0.01"
                 min={0}
                 {...settingsForm.register("fixedExpenses")}
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-zinc-400">
                 Debt minimums are added automatically.
               </p>
             </div>
             <DialogFooter>
               <Button
                 type="submit"
-                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
               >
                 Save Settings
               </Button>

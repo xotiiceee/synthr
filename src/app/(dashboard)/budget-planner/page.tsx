@@ -28,9 +28,9 @@ export default function BudgetPlannerPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-48 bg-slate-800 rounded animate-pulse" />
+        <div className="h-8 w-48 bg-zinc-800 rounded animate-pulse" />
         <div className="grid gap-4 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-slate-800 rounded animate-pulse" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-zinc-800 rounded animate-pulse" />)}
         </div>
       </div>
     );
@@ -41,7 +41,7 @@ export default function BudgetPlannerPage() {
 
   if (!plan) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+      <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
         <BarChart3 className="h-12 w-12 mb-4 opacity-20" />
         <p className="text-lg">Add some transactions to generate your budget plan</p>
       </div>
@@ -58,8 +58,8 @@ export default function BudgetPlannerPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Budget Planner</h1>
-          <p className="text-muted-foreground">Your personalized spending plan based on real data</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">Budget Planner</h1>
+          <p className="text-zinc-400">Your personalized spending plan based on real data</p>
         </div>
         {ai && (
           <Badge className="gap-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
@@ -70,7 +70,7 @@ export default function BudgetPlannerPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10 border-t-2 border-t-emerald-400">
+        <Card className="border border-white/5 bg-zinc-900 rounded-xl border-t-2 border-t-emerald-400">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Monthly Income</CardTitle>
             <TrendingUp className="h-4 w-4 text-emerald-400" />
@@ -80,43 +80,43 @@ export default function BudgetPlannerPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10 border-t-2 border-t-amber-400">
+        <Card className="border border-white/5 bg-zinc-900 rounded-xl border-t-2 border-t-amber-400">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Bills & Debt</CardTitle>
             <Receipt className="h-4 w-4 text-amber-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-amber-400">{fmt(plan.billTotal)}</div>
-            <p className="text-xs text-muted-foreground">recurring bills + minimum payments</p>
+            <p className="text-xs text-zinc-400">recurring bills + minimum payments</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10 border-t-2 border-t-[#00d4aa]">
+        <Card className="border border-white/5 bg-zinc-900 rounded-xl border-t-2 border-t-[#00d4aa]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Safe to Spend</CardTitle>
             <Wallet className="h-4 w-4 text-[#00d4aa]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#00d4aa]">{fmt(plan.safeToSpend)}</div>
-            <p className="text-xs text-muted-foreground">after bills, debt, and savings</p>
+            <p className="text-xs text-zinc-400">after bills, debt, and savings</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10 border-t-2 border-t-purple-400">
+        <Card className="border border-white/5 bg-zinc-900 rounded-xl border-t-2 border-t-purple-400">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Daily Budget</CardTitle>
             <Coffee className="h-4 w-4 text-purple-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-400">{fmt(plan.dailyBudget)}</div>
-            <p className="text-xs text-muted-foreground">${plan.weeklyBudget}/week</p>
+            <p className="text-xs text-zinc-400">${plan.weeklyBudget}/week</p>
           </CardContent>
         </Card>
       </div>
 
       {/* 50/30/20 Chart + Monthly Breakdown */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10">
+        <Card className="border border-white/5 bg-zinc-900 rounded-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-[#00d4aa]" />
@@ -133,7 +133,7 @@ export default function BudgetPlannerPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ background: "#1e293b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px" }}
+                    contentStyle={{ background: "#18181b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px" }}
                     formatter={(value: any) => fmt(Number(value))}
                   />
                 </PieChart>
@@ -143,14 +143,14 @@ export default function BudgetPlannerPage() {
               {pieData.map((d) => (
                 <div key={d.name} className="flex items-center gap-2 text-sm">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                  <span className="text-muted-foreground">{d.name.split(" ")[0]}</span>
+                  <span className="text-zinc-400">{d.name.split(" ")[0]}</span>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10">
+        <Card className="border border-white/5 bg-zinc-900 rounded-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-amber-400" />
@@ -165,11 +165,11 @@ export default function BudgetPlannerPage() {
               { label: "Remaining", value: plan.monthlyBreakdown.remaining, color: "text-[#00d4aa]" },
             ].map((item) => (
               <div key={item.label} className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">{item.label}</span>
+                <span className="text-sm text-zinc-400">{item.label}</span>
                 <span className={`font-semibold ${item.color}`}>{fmt(item.value)}</span>
               </div>
             ))}
-            <div className="h-px bg-white/10" />
+            <div className="h-px bg-white/5" />
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Recommended Savings</span>
               <span className="font-bold text-[#00d4aa] text-lg">{fmt(plan.recommendedSavings)}</span>
@@ -180,7 +180,7 @@ export default function BudgetPlannerPage() {
 
       {/* AI Insights */}
       {ai && (
-        <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10 border border-purple-400/20">
+        <Card className="border border-purple-400/20 bg-zinc-900 rounded-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-purple-400" />
@@ -208,7 +208,7 @@ export default function BudgetPlannerPage() {
       {/* Warnings & Suggestions */}
       <div className="grid gap-6 md:grid-cols-2">
         {plan.warnings.length > 0 && (
-          <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10 border-l-2 border-l-amber-400">
+          <Card className="border border-white/5 bg-zinc-900 rounded-xl border-l-2 border-l-amber-400">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-amber-400">
                 <AlertTriangle className="h-5 w-5" />
@@ -220,7 +220,7 @@ export default function BudgetPlannerPage() {
                 {plan.warnings.map((w: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <span className="text-amber-400 mt-1">•</span>
-                    <span className="text-muted-foreground">{w}</span>
+                    <span className="text-zinc-400">{w}</span>
                   </li>
                 ))}
               </ul>
@@ -228,7 +228,7 @@ export default function BudgetPlannerPage() {
           </Card>
         )}
 
-        <Card className="bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10 border-l-2 border-l-[#00d4aa]">
+        <Card className="border border-white/5 bg-zinc-900 rounded-xl border-l-2 border-l-[#00d4aa]">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-[#00d4aa]">
               <Lightbulb className="h-5 w-5" />
@@ -240,7 +240,7 @@ export default function BudgetPlannerPage() {
               {plan.suggestions.map((s: string, i: number) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
                   <CheckCircle2 className="h-4 w-4 text-[#00d4aa] mt-0.5 shrink-0" />
-                  <span className="text-muted-foreground">{s}</span>
+                  <span className="text-zinc-400">{s}</span>
                 </li>
               ))}
             </ul>

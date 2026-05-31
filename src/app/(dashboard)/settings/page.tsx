@@ -64,8 +64,8 @@ interface Category {
   icon?: string | null;
 }
 
-const glassCard = "relative overflow-hidden border-0 bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10";
-const dangerCard = "relative overflow-hidden border-0 bg-slate-800/50 backdrop-blur-xl ring-1 ring-rose-500/30";
+const glassCard = "relative overflow-hidden border border-white/5 bg-zinc-900 rounded-xl";
+const dangerCard = "relative overflow-hidden border border-rose-500/30 bg-zinc-900 rounded-xl";
 
 async function fetchCategories(): Promise<Category[]> {
   const res = await fetch("/api/categories");
@@ -254,14 +254,14 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-4xl space-y-8">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 ring-1 ring-white/10">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-800 border border-white/5">
           <Settings className="h-5 w-5 text-[#00d4aa]" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-100">
+          <h1 className="text-2xl font-bold tracking-tight text-white">
             Settings
           </h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-zinc-400">
             Manage your profile, categories, and preferences.
           </p>
         </div>
@@ -270,18 +270,18 @@ export default function SettingsPage() {
       {/* Profile */}
       <Card className={cn(glassCard)}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-slate-200">
+          <CardTitle className="flex items-center gap-2 text-zinc-200">
             <User className="h-5 w-5 text-[#00d4aa]" />
             Profile
           </CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardDescription className="text-zinc-400">
             Update your personal information.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-slate-300">
+              <Label htmlFor="name" className="text-zinc-300">
                 Display Name
               </Label>
               <Input
@@ -289,20 +289,20 @@ export default function SettingsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-300">
+              <Label htmlFor="email" className="text-zinc-300">
                 Email
               </Label>
               <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-slate-500" />
+                <Mail className="h-4 w-4 text-zinc-500" />
                 <Input
                   id="email"
                   value={email}
                   readOnly
-                  className="bg-slate-900/50 text-slate-400 ring-1 ring-white/10"
+                  className="bg-zinc-900/50 text-zinc-400 ring-1 ring-white/10"
                 />
               </div>
             </div>
@@ -311,14 +311,14 @@ export default function SettingsPage() {
             <Button
               onClick={handleSaveProfile}
               disabled={profileSaving}
-              className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+              className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
             >
               <Save className="mr-2 h-4 w-4" />
               {profileSaving ? "Saving..." : "Save Profile"}
             </Button>
             <Button
               variant="outline"
-              className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
+              className="border-white/5 text-zinc-300 hover:bg-zinc-700 hover:text-white"
             >
               <Lock className="mr-2 h-4 w-4" />
               Change Password
@@ -331,18 +331,18 @@ export default function SettingsPage() {
       <Card className={cn(glassCard)}>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2 text-slate-200">
+            <CardTitle className="flex items-center gap-2 text-zinc-200">
               <Palette className="h-5 w-5 text-[#00d4aa]" />
               Categories
             </CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription className="text-zinc-400">
               Manage your income and expense categories.
             </CardDescription>
           </div>
           <Button
             size="sm"
             onClick={openAddCategory}
-            className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+            className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
           >
             <Plus className="mr-1 h-4 w-4" />
             Add Category
@@ -350,9 +350,9 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           {catsLoading ? (
-            <div className="text-slate-400">Loading categories...</div>
+            <div className="text-zinc-400">Loading categories...</div>
           ) : cats.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-600 p-6 text-center text-sm text-slate-400">
+            <div className="rounded-xl border border-dashed border-white/5 p-6 text-center text-sm text-zinc-400">
               No categories yet. Add one to get started.
             </div>
           ) : (
@@ -360,10 +360,10 @@ export default function SettingsPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/5 hover:bg-transparent">
-                    <TableHead className="text-slate-400">Name</TableHead>
-                    <TableHead className="text-slate-400">Type</TableHead>
-                    <TableHead className="text-slate-400">Color</TableHead>
-                    <TableHead className="text-right text-slate-400">
+                    <TableHead className="text-zinc-400">Name</TableHead>
+                    <TableHead className="text-zinc-400">Type</TableHead>
+                    <TableHead className="text-zinc-400">Color</TableHead>
+                    <TableHead className="text-right text-zinc-400">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -371,7 +371,7 @@ export default function SettingsPage() {
                 <TableBody>
                   {cats.map((cat) => (
                     <TableRow key={cat.id} className="border-white/5">
-                      <TableCell className="font-medium text-slate-200">
+                      <TableCell className="font-medium text-zinc-200">
                         {cat.name}
                       </TableCell>
                       <TableCell>
@@ -393,12 +393,12 @@ export default function SettingsPage() {
                               className="h-4 w-4 rounded-full ring-1 ring-white/10"
                               style={{ backgroundColor: cat.color }}
                             />
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-zinc-400">
                               {cat.color}
                             </span>
                           </div>
                         ) : (
-                          <span className="text-slate-500">-</span>
+                          <span className="text-zinc-500">-</span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -407,7 +407,7 @@ export default function SettingsPage() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() => openEditCategory(cat)}
-                            className="text-slate-400 hover:text-slate-200"
+                            className="text-zinc-400 hover:text-zinc-200"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -423,7 +423,7 @@ export default function SettingsPage() {
                                 deleteCatMutation.mutate(cat.id);
                               }
                             }}
-                            className="text-slate-400 hover:text-rose-400"
+                            className="text-zinc-400 hover:text-rose-400"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -441,38 +441,38 @@ export default function SettingsPage() {
       {/* Preferences */}
       <Card className={cn(glassCard)}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-slate-200">
+          <CardTitle className="flex items-center gap-2 text-zinc-200">
             <DollarSign className="h-5 w-5 text-[#00d4aa]" />
             Preferences
           </CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardDescription className="text-zinc-400">
             Customize your app experience.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label className="text-slate-300">Currency</Label>
+            <Label className="text-zinc-300">Currency</Label>
             <Select
               value={currency}
               onValueChange={(v: string | null) => setCurrency(v ?? "USD")}
             >
-              <SelectTrigger className="w-40 bg-slate-800 ring-1 ring-white/10">
+              <SelectTrigger className="w-40 bg-zinc-800 border border-white/5">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
-                <SelectItem value="USD" className="focus:bg-slate-700">
+              <SelectContent className="border-0 bg-zinc-800 border border-white/5">
+                <SelectItem value="USD" className="focus:bg-zinc-700">
                   USD ($)
                 </SelectItem>
-                <SelectItem value="EUR" className="focus:bg-slate-700">
+                <SelectItem value="EUR" className="focus:bg-zinc-700">
                   EUR (€)
                 </SelectItem>
-                <SelectItem value="GBP" className="focus:bg-slate-700">
+                <SelectItem value="GBP" className="focus:bg-zinc-700">
                   GBP (£)
                 </SelectItem>
-                <SelectItem value="JPY" className="focus:bg-slate-700">
+                <SelectItem value="JPY" className="focus:bg-zinc-700">
                   JPY (¥)
                 </SelectItem>
-                <SelectItem value="CAD" className="focus:bg-slate-700">
+                <SelectItem value="CAD" className="focus:bg-zinc-700">
                   CAD (C$)
                 </SelectItem>
               </SelectContent>
@@ -480,14 +480,14 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-slate-300">Theme</Label>
-            <div className="inline-flex gap-1 rounded-lg bg-slate-900/50 p-1 ring-1 ring-white/5">
+            <Label className="text-zinc-300">Theme</Label>
+            <div className="inline-flex gap-1 rounded-lg bg-zinc-900/50 p-1 ring-1 ring-white/5">
               <Button
                 variant={theme === "dark" ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setTheme("dark")}
                 className={cn(
-                  theme === "dark" && "bg-slate-700 text-slate-100"
+                  theme === "dark" && "bg-zinc-700 text-white"
                 )}
               >
                 <Moon className="mr-1 h-4 w-4" />
@@ -498,7 +498,7 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={() => setTheme("light")}
                 className={cn(
-                  theme === "light" && "bg-slate-700 text-slate-100"
+                  theme === "light" && "bg-zinc-700 text-white"
                 )}
               >
                 <Sun className="mr-1 h-4 w-4" />
@@ -509,7 +509,7 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={() => setTheme("system")}
                 className={cn(
-                  theme === "system" && "bg-slate-700 text-slate-100"
+                  theme === "system" && "bg-zinc-700 text-white"
                 )}
               >
                 <Monitor className="mr-1 h-4 w-4" />
@@ -527,15 +527,15 @@ export default function SettingsPage() {
             <AlertTriangle className="h-5 w-5" />
             Danger Zone
           </CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardDescription className="text-zinc-400">
             Destructive actions that cannot be undone.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col gap-4 rounded-lg bg-rose-500/5 p-4 ring-1 ring-rose-500/10 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h4 className="font-medium text-slate-200">Delete All Data</h4>
-              <p className="text-sm text-slate-400">
+              <h4 className="font-medium text-zinc-200">Delete All Data</h4>
+              <p className="text-sm text-zinc-400">
                 Permanently remove all your transactions, accounts, and settings.
               </p>
             </div>
@@ -547,17 +547,17 @@ export default function SettingsPage() {
               Delete All Data
             </Button>
           </div>
-          <div className="flex flex-col gap-4 rounded-lg bg-slate-900/40 p-4 ring-1 ring-white/5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-4 ring-1 ring-white/5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h4 className="font-medium text-slate-200">Export All Data</h4>
-              <p className="text-sm text-slate-400">
+              <h4 className="font-medium text-zinc-200">Export All Data</h4>
+              <p className="text-sm text-zinc-400">
                 Download a complete backup of your data.
               </p>
             </div>
             <Button
               variant="outline"
               onClick={handleExportAll}
-              className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
+              className="border-white/5 text-zinc-300 hover:bg-zinc-700 hover:text-white"
             >
               <Download className="mr-2 h-4 w-4" />
               Export All Data
@@ -568,12 +568,12 @@ export default function SettingsPage() {
 
       {/* Category Dialog */}
       <Dialog open={catDialogOpen} onOpenChange={setCatDialogOpen}>
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="border-0 bg-zinc-900 border border-white/5">
           <DialogHeader>
-            <DialogTitle className="text-slate-100">
+            <DialogTitle className="text-white">
               {editingCategory ? "Edit Category" : "Add Category"}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
+            <DialogDescription className="text-zinc-400">
               {editingCategory
                 ? "Update this category."
                 : "Create a new income or expense category."}
@@ -581,7 +581,7 @@ export default function SettingsPage() {
           </DialogHeader>
           <form onSubmit={handleCatSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="catName" className="text-slate-300">
+              <Label htmlFor="catName" className="text-zinc-300">
                 Name
               </Label>
               <Input
@@ -592,11 +592,11 @@ export default function SettingsPage() {
                 }
                 placeholder="e.g. Dining Out"
                 required
-                className="bg-slate-800 ring-1 ring-white/10"
+                className="bg-zinc-800 border border-white/5"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="catType" className="text-slate-300">
+              <Label htmlFor="catType" className="text-zinc-300">
                 Type
               </Label>
               <Select
@@ -608,21 +608,21 @@ export default function SettingsPage() {
                   })
                 }
               >
-                <SelectTrigger className="bg-slate-800 ring-1 ring-white/10">
+                <SelectTrigger className="bg-zinc-800 border border-white/5">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
-                  <SelectItem value="INCOME" className="focus:bg-slate-700">
+                <SelectContent className="border-0 bg-zinc-800 border border-white/5">
+                  <SelectItem value="INCOME" className="focus:bg-zinc-700">
                     Income
                   </SelectItem>
-                  <SelectItem value="EXPENSE" className="focus:bg-slate-700">
+                  <SelectItem value="EXPENSE" className="focus:bg-zinc-700">
                     Expense
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="catColor" className="text-slate-300">
+              <Label htmlFor="catColor" className="text-zinc-300">
                 Color
               </Label>
               <div className="flex items-center gap-3">
@@ -633,9 +633,9 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setCatForm({ ...catForm, color: e.target.value })
                   }
-                  className="h-8 w-12 bg-slate-800 px-1 ring-1 ring-white/10"
+                  className="h-8 w-12 bg-zinc-800 px-1 ring-1 ring-white/10"
                 />
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-zinc-400">
                   {catForm.color}
                 </span>
               </div>
@@ -645,7 +645,7 @@ export default function SettingsPage() {
                 type="button"
                 variant="outline"
                 onClick={closeCatDialog}
-                className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
+                className="border-white/5 text-zinc-300 hover:bg-zinc-700 hover:text-white"
               >
                 Cancel
               </Button>
@@ -656,7 +656,7 @@ export default function SettingsPage() {
                   updateCatMutation.isPending ||
                   !catForm.name.trim()
                 }
-                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"
               >
                 {editingCategory ? "Save Changes" : "Create Category"}
               </Button>
@@ -667,13 +667,13 @@ export default function SettingsPage() {
 
       {/* Delete Confirm Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="border-0 bg-zinc-900 border border-white/5">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-rose-400">
               <AlertTriangle className="h-5 w-5" />
               Delete All Data?
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
+            <DialogDescription className="text-zinc-400">
               This action cannot be undone. All your data will be permanently
               removed.
             </DialogDescription>
@@ -682,7 +682,7 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               onClick={() => setDeleteConfirmOpen(false)}
-              className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
+              className="border-white/5 text-zinc-300 hover:bg-zinc-700 hover:text-white"
             >
               Cancel
             </Button>

@@ -3,11 +3,11 @@ import { Sidebar, DashboardHeader } from "@/components/layout/sidebar";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen overflow-hidden bg-zinc-950">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader />
-        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
+        <main className="flex-1 overflow-auto bg-zinc-950 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

@@ -130,13 +130,13 @@ async function deleteBudget(id: string) {
 function getProgressColor(percentage: number): string {
   if (percentage >= 100) return "bg-red-500";
   if (percentage >= 80) return "bg-yellow-400";
-  return "bg-emerald-500";
+  return "bg-[#00d4aa]";
 }
 
 function getProgressTextColor(percentage: number): string {
   if (percentage >= 100) return "text-red-400";
   if (percentage >= 80) return "text-yellow-400";
-  return "text-emerald-400";
+  return "text-[#00d4aa]";
 }
 
 const categoryIconMap: Record<string, React.ElementType> = {
@@ -180,7 +180,7 @@ function CategoryIcon({
         "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
         className
       )}
-      style={{ backgroundColor: `${color || "#00d4aa"}20`, color: color || "#00d4aa" }}
+      style={{ backgroundColor: `${color || "#00d4aa"}15`, color: color || "#00d4aa" }}
     >
       <Icon className="h-5 w-5" />
     </div>
@@ -212,7 +212,7 @@ function CircularProgress({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="rgba(255,255,255,0.06)"
+          stroke="rgba(255,255,255,0.05)"
           strokeWidth={strokeWidth}
         />
         <circle
@@ -225,16 +225,13 @@ function CircularProgress({
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 0.6s ease" }}
+          className="transition-[stroke-dashoffset] duration-700 ease-out"
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">{children}</div>
     </div>
   );
 }
-
-const glassCard =
-  "relative overflow-hidden border-0 bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10";
 
 export default function BudgetsPage() {
   const queryClient = useQueryClient();
@@ -327,30 +324,31 @@ export default function BudgetsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">
+          <h1 className="text-3xl font-semibold tracking-tight text-white">
             Budgets
           </h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-muted-foreground">
             Set and track your spending limits.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 rounded-lg bg-slate-800/50 ring-1 ring-white/10">
+          {/* Month Navigator */}
+          <div className="flex items-center gap-1 rounded-xl bg-zinc-900 border border-white/5">
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 text-slate-400 hover:text-white"
+              className="h-9 w-9 text-zinc-400 hover:text-white"
               onClick={() => setPeriod((p) => shiftPeriod(p, -1))}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="min-w-[140px] text-center text-sm font-medium text-slate-200">
+            <span className="min-w-[140px] text-center text-sm font-medium text-white">
               {formatPeriod(period)}
             </span>
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 text-slate-400 hover:text-white"
+              className="h-9 w-9 text-zinc-400 hover:text-white"
               onClick={() => setPeriod((p) => shiftPeriod(p, 1))}
             >
               <ChevronRight className="h-4 w-4" />
@@ -358,7 +356,7 @@ export default function BudgetsPage() {
           </div>
           <Button
             onClick={openCreate}
-            className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+            className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Budget
@@ -367,19 +365,20 @@ export default function BudgetsPage() {
       </div>
 
       {/* Summary */}
-      <Card className={cn(glassCard, "p-0")}>
-        <CardContent className="flex flex-col items-center gap-6 py-8 md:flex-row md:justify-between md:px-8">
+      <div className="rounded-xl bg-zinc-900 border border-white/5 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-[#00d4aa]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+        <div className="relative flex flex-col items-center gap-6 py-8 md:flex-row md:justify-between md:px-8">
           <div className="flex flex-col items-center md:items-start gap-1">
-            <div className="text-sm font-medium text-slate-400">
+            <p className="text-sm font-medium text-muted-foreground">
               Total Budgeted
-            </div>
-            <div className="text-4xl font-bold tracking-tight text-white">
+            </p>
+            <p className="text-4xl font-bold tracking-tight text-white">
               {formatCurrency(totalBudget)}
-            </div>
+            </p>
             <div className="mt-2 flex items-center gap-4 text-sm">
               <div className="flex items-center gap-1.5">
-                <TrendingDown className="h-4 w-4 text-rose-400" />
-                <span className="text-slate-300">
+                <TrendingDown className="h-4 w-4 text-red-400" />
+                <span className="text-zinc-300">
                   Spent {formatCurrency(totalSpent)}
                 </span>
               </div>
@@ -409,47 +408,45 @@ export default function BudgetsPage() {
                 >
                   {overallPercentage.toFixed(0)}%
                 </div>
-                <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                <div className="text-[10px] uppercase tracking-wider text-zinc-500">
                   Used
                 </div>
               </div>
             </CircularProgress>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Budgets Grid */}
       {budgetsLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Card
+            <div
               key={i}
-              className={cn(glassCard, "h-40 animate-pulse bg-slate-800/30")}
+              className="rounded-xl bg-zinc-900 border border-white/5 h-40 animate-pulse"
             />
           ))}
         </div>
       ) : budgets.length === 0 ? (
-        <Card className={cn(glassCard, "py-16")}>
-          <CardContent className="flex flex-col items-center justify-center text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#00d4aa]/10">
-              <Wallet className="h-8 w-8 text-[#00d4aa]" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold text-white">
-              No budgets set
-            </h3>
-            <p className="mt-1 max-w-xs text-sm text-slate-400">
-              Create your first budget to start tracking spending and stay in
-              control of your finances.
-            </p>
-            <Button
-              onClick={openCreate}
-              className="mt-6 bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create your first budget
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border border-dashed border-white/10 bg-zinc-900/50 p-12 text-center">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[#00d4aa]/10 mb-4">
+            <Wallet className="h-8 w-8 text-[#00d4aa]" />
+          </div>
+          <h3 className="text-lg font-semibold text-white">
+            No budgets set
+          </h3>
+          <p className="mt-1 max-w-xs mx-auto text-sm text-muted-foreground">
+            Create your first budget to start tracking spending and stay in
+            control of your finances.
+          </p>
+          <Button
+            onClick={openCreate}
+            className="mt-6 bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Create your first budget
+          </Button>
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {budgets.map((budget) => {
@@ -458,103 +455,104 @@ export default function BudgetsPage() {
                 ? (budget.spent / Number(budget.amount)) * 100
                 : 0;
             return (
-              <Card key={budget.id} className={cn(glassCard)}>
-                <CardContent className="flex flex-col gap-4 pt-5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <CategoryIcon
-                        name={budget.category.name}
-                        color={budget.category.color}
-                      />
-                      <div>
-                        <CardTitle className="text-sm font-medium text-white">
-                          {budget.category.name}
-                        </CardTitle>
-                        <CardDescription className="text-xs">
-                          {formatCurrency(budget.spent)} of{" "}
-                          {formatCurrency(Number(budget.amount))}
-                        </CardDescription>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-white"
-                        onClick={() => openEdit(budget)}
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-red-400"
-                        onClick={() => {
-                          if (
-                            confirm(
-                              "Are you sure you want to delete this budget?"
-                            )
-                          ) {
-                            deleteMutation.mutate(budget.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span
-                        className={cn(
-                          "font-semibold",
-                          getProgressTextColor(percentage)
-                        )}
-                      >
-                        {percentage.toFixed(0)}%
-                      </span>
-                      <span
-                        className={cn(
-                          "text-xs font-medium",
-                          budget.remaining >= 0
-                            ? "text-emerald-400"
-                            : "text-red-400"
-                        )}
-                      >
-                        {budget.remaining >= 0
-                          ? `${formatCurrency(budget.remaining)} left`
-                          : `${formatCurrency(Math.abs(budget.remaining))} over`}
-                      </span>
-                    </div>
-                    <Progress value={Math.min(percentage, 100)}>
-                      <ProgressTrack className="h-2 bg-slate-700/50">
-                        <ProgressIndicator
-                          className={cn(
-                            "rounded-full",
-                            getProgressColor(percentage)
-                          )}
-                        />
-                      </ProgressTrack>
-                    </Progress>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="text-xs text-slate-500">
-                      Target{" "}
-                      <span className="text-slate-300">
+              <div
+                key={budget.id}
+                className="group rounded-xl bg-zinc-900 border border-white/5 p-5 transition-all hover:bg-zinc-800/80 hover:border-white/10"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <CategoryIcon
+                      name={budget.category.name}
+                      color={budget.category.color}
+                    />
+                    <div>
+                      <h3 className="text-sm font-medium text-white">
+                        {budget.category.name}
+                      </h3>
+                      <p className="text-xs text-zinc-400">
+                        {formatCurrency(budget.spent)} of{" "}
                         {formatCurrency(Number(budget.amount))}
-                      </span>
+                      </p>
                     </div>
-                    {budget.rollover && (
-                      <div className="flex items-center gap-1 text-xs font-medium text-[#00d4aa]">
-                        <RotateCcw className="h-3 w-3" />
-                        Rollover
-                      </div>
-                    )}
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => openEdit(budget)}
+                      className="text-zinc-400 hover:text-white hover:bg-white/10"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => {
+                        if (
+                          confirm(
+                            "Are you sure you want to delete this budget?"
+                          )
+                        ) {
+                          deleteMutation.mutate(budget.id);
+                        }
+                      }}
+                      className="text-zinc-400 hover:text-red-400 hover:bg-red-400/10"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span
+                      className={cn(
+                        "font-semibold",
+                        getProgressTextColor(percentage)
+                      )}
+                    >
+                      {percentage.toFixed(0)}%
+                    </span>
+                    <span
+                      className={cn(
+                        "text-xs font-medium",
+                        budget.remaining >= 0
+                          ? "text-emerald-400"
+                          : "text-red-400"
+                      )}
+                    >
+                      {budget.remaining >= 0
+                        ? `${formatCurrency(budget.remaining)} left`
+                        : `${formatCurrency(Math.abs(budget.remaining))} over`}
+                    </span>
+                  </div>
+                  <Progress value={Math.min(percentage, 100)}>
+                    <ProgressTrack className="h-2 bg-white/5">
+                      <ProgressIndicator
+                        className={cn(
+                          "rounded-full",
+                          getProgressColor(percentage)
+                        )}
+                      />
+                    </ProgressTrack>
+                  </Progress>
+                </div>
+
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                  <p className="text-xs text-zinc-500">
+                    Target{" "}
+                    <span className="text-zinc-300">
+                      {formatCurrency(Number(budget.amount))}
+                    </span>
+                  </p>
+                  {budget.rollover && (
+                    <div className="flex items-center gap-1 text-xs font-medium text-[#00d4aa]">
+                      <RotateCcw className="h-3 w-3" />
+                      Rollover
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>
@@ -562,7 +560,7 @@ export default function BudgetsPage() {
 
       {/* Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="border-0 bg-slate-900 ring-1 ring-white/10">
+        <DialogContent className="bg-zinc-900 border-white/5 rounded-xl shadow-2xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle className="text-white">
@@ -576,7 +574,7 @@ export default function BudgetsPage() {
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category" className="text-white">Category</Label>
                 <Select
                   value={categoryId}
                   onValueChange={(val) => setCategoryId(val ?? "")}
@@ -584,16 +582,16 @@ export default function BudgetsPage() {
                 >
                   <SelectTrigger
                     id="category"
-                    className="bg-slate-800 ring-1 ring-white/10"
+                    className="bg-zinc-950 border-white/10 text-white"
                   >
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
-                  <SelectContent className="border-0 bg-slate-800 ring-1 ring-white/10">
+                  <SelectContent className="bg-zinc-900 border-white/10">
                     {categories.map((cat) => (
                       <SelectItem
                         key={cat.id}
                         value={cat.id}
-                        className="focus:bg-slate-700"
+                        className="text-white focus:bg-white/10"
                       >
                         {cat.name}
                       </SelectItem>
@@ -602,7 +600,7 @@ export default function BudgetsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="amount">Budget Amount</Label>
+                <Label htmlFor="amount" className="text-white">Budget Amount</Label>
                 <Input
                   id="amount"
                   type="number"
@@ -611,7 +609,7 @@ export default function BudgetsPage() {
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00"
                   required
-                  className="bg-slate-800 ring-1 ring-white/10"
+                  className="bg-zinc-950 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -620,9 +618,9 @@ export default function BudgetsPage() {
                   type="checkbox"
                   checked={rollover}
                   onChange={(e) => setRollover(e.target.checked)}
-                  className="h-4 w-4 rounded border-border bg-slate-800"
+                  className="h-4 w-4 rounded border-white/10 bg-zinc-950 text-[#00d4aa]"
                 />
-                <Label htmlFor="rollover" className="font-normal">
+                <Label htmlFor="rollover" className="font-normal text-zinc-300">
                   Enable rollover
                 </Label>
               </div>
@@ -632,14 +630,14 @@ export default function BudgetsPage() {
                 type="button"
                 variant="outline"
                 onClick={closeDialog}
-                className="border-white/10 bg-transparent hover:bg-white/5"
+                className="border-white/10 text-white hover:bg-white/10 hover:text-white"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="bg-[#00d4aa] text-slate-900 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20"
               >
                 {editingBudget ? "Save Changes" : "Create Budget"}
               </Button>

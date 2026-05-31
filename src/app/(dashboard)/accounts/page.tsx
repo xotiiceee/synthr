@@ -12,8 +12,11 @@ import {
   Plus,
   Pencil,
   Trash2,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -31,8 +34,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
-import { formatCurrency } from "@/lib/utils";
+import { Progress, ProgressTrack, ProgressIndicator } from "@/components/ui/progress";
+import { formatCurrency, cn } from "@/lib/utils";
 import { AccountType } from "@prisma/client";
 import {
   PieChart,
@@ -59,13 +62,13 @@ const accountTypeIcons: Record<AccountType, React.ReactNode> = {
   LOAN: <Receipt className="h-5 w-5" />,
 };
 
-const accountTypeColors: Record<AccountType, string> = {
-  CHECKING: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  SAVINGS: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  CREDIT: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  CASH: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  INVESTMENT: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-  LOAN: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+const accountTypeLabel: Record<AccountType, string> = {
+  CHECKING: "Checking",
+  SAVINGS: "Savings",
+  CREDIT: "Credit",
+  CASH: "Cash",
+  INVESTMENT: "Investment",
+  LOAN: "Loan",
 };
 
 const accountChartColors: Record<AccountType, string> = {
@@ -140,7 +143,7 @@ export default function AccountsPage() {
     .reduce((sum, a) => sum + Number(a.balance), 0);
 
   const netWorth = assets - liabilities;
-  const totalValue = assets + liabilities;
+  const totalValue = accounts.reduce((sum, a) => sum + Math.abs(Number(a.balance)), 0);
 
   const chartData = useMemo(() => {
     const groups: Record<string, number> = {};
@@ -240,7 +243,7 @@ export default function AccountsPage() {
         </div>
         <Button
           onClick={openCreate}
-          className="bg-[#00d4aa] text-slate-950 hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20"
+          className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Account
@@ -249,36 +252,45 @@ export default function AccountsPage() {
 
       {/* Net Worth + Distribution */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 flex flex-col justify-between">
-          <div>
+        {/* Net Worth Card */}
+        <div className="lg:col-span-2 rounded-xl bg-zinc-900 border border-white/5 p-6 md:p-8 flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#00d4aa]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+          <div className="relative">
             <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
               Net Worth
             </p>
-            <p className="text-4xl md:text-5xl font-bold text-[#00d4aa] mt-2">
+            <p className="text-4xl md:text-5xl font-bold text-[#00d4aa] mt-2 tracking-tight">
               {formatCurrency(netWorth)}
             </p>
           </div>
-          <div className="flex gap-8 mt-6">
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
-                Total Assets
-              </p>
-              <p className="text-xl font-semibold text-emerald-400 mt-1">
-                {formatCurrency(assets)}
-              </p>
+          <div className="flex gap-8 mt-6 relative">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-emerald-400" />
+              <div>
+                <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">
+                  Assets
+                </p>
+                <p className="text-lg font-semibold text-emerald-400 mt-0.5">
+                  {formatCurrency(assets)}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
-                Total Liabilities
-              </p>
-              <p className="text-xl font-semibold text-red-400 mt-1">
-                {formatCurrency(liabilities)}
-              </p>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-red-400" />
+              <div>
+                <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">
+                  Liabilities
+                </p>
+                <p className="text-lg font-semibold text-red-400 mt-0.5">
+                  {formatCurrency(liabilities)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-6 flex flex-col">
+        {/* Distribution Card */}
+        <div className="rounded-xl bg-zinc-900 border border-white/5 p-6 flex flex-col">
           <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium mb-4">
             Distribution
           </p>
@@ -303,10 +315,10 @@ export default function AccountsPage() {
                   <RechartsTooltip
                     formatter={(value) => formatCurrency(Number(value))}
                     contentStyle={{
-                      backgroundColor: "#1e293b",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      backgroundColor: "#18181b",
+                      border: "1px solid rgba(255,255,255,0.05)",
                       borderRadius: "12px",
-                      color: "#f8fafc",
+                      color: "#fafafa",
                     }}
                   />
                 </PieChart>
@@ -339,12 +351,15 @@ export default function AccountsPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="rounded-2xl bg-white/5 border border-white/10 p-5 animate-pulse h-44"
+              className="rounded-xl bg-zinc-900 border border-white/5 p-5 animate-pulse h-44"
             />
           ))}
         </div>
       ) : accounts.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-8 text-center">
+        <div className="rounded-xl border border-dashed border-white/10 bg-zinc-900/50 p-12 text-center">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 mb-4">
+            <Wallet className="h-6 w-6 text-muted-foreground" />
+          </div>
           <p className="text-muted-foreground">
             No accounts yet. Add your first account to get started.
           </p>
@@ -352,18 +367,22 @@ export default function AccountsPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {accounts.map((account) => {
+            const isLiability = liabilityTypes.includes(account.type);
+            const absBalance = Math.abs(Number(account.balance));
             const percent =
               totalValue > 0
-                ? (Math.abs(Number(account.balance)) / totalValue) * 100
+                ? (absBalance / totalValue) * 100
                 : 0;
+            const balanceColor = account.balance >= 0 ? "text-white" : "text-red-400";
+            const progressColor = isLiability ? "bg-red-500" : "bg-[#00d4aa]";
             return (
               <div
                 key={account.id}
-                className="group relative rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-5 transition-all hover:bg-white/[0.07] hover:border-white/20"
+                className="group relative rounded-xl bg-zinc-900 border border-white/5 p-5 transition-all hover:bg-zinc-800/80 hover:border-white/10"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-xl bg-white/5 p-3 text-[#00d4aa] ring-1 ring-white/10">
+                    <div className="rounded-xl bg-zinc-800 p-2.5 text-[#00d4aa] ring-1 ring-white/5">
                       {accountTypeIcons[account.type]}
                     </div>
                     <div>
@@ -371,12 +390,9 @@ export default function AccountsPage() {
                         {account.name}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${accountTypeColors[account.type]}`}
-                        >
-                          {account.type.charAt(0) +
-                            account.type.slice(1).toLowerCase()}
-                        </span>
+                        <Badge variant="outline" className="text-[10px] font-medium border-white/10 text-zinc-300 py-0">
+                          {accountTypeLabel[account.type]}
+                        </Badge>
                         {account.isDefault && (
                           <span className="text-[10px] text-[#00d4aa] font-medium">
                             Default
@@ -390,7 +406,7 @@ export default function AccountsPage() {
                       variant="ghost"
                       size="icon-sm"
                       onClick={() => openEdit(account)}
-                      className="text-muted-foreground hover:text-white hover:bg-white/10"
+                      className="text-zinc-400 hover:text-white hover:bg-white/10"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -406,19 +422,23 @@ export default function AccountsPage() {
                           deleteMutation.mutate(account.id);
                         }
                       }}
-                      className="text-muted-foreground hover:text-red-400 hover:bg-red-400/10"
+                      className="text-zinc-400 hover:text-red-400 hover:bg-red-400/10"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
-                <div className="mt-6">
-                  <div className="text-2xl font-bold text-white">
-                    {formatCurrency(Number(account.balance))}
-                  </div>
+                <div className="mt-5">
+                  <p className={cn("text-2xl font-bold", balanceColor)}>
+                    {isLiability && account.balance !== 0 ? "-" : ""}{formatCurrency(absBalance)}
+                  </p>
                   <div className="mt-4">
-                    <Progress value={percent} />
-                    <p className="mt-1.5 text-xs text-muted-foreground">
+                    <Progress value={percent}>
+                      <ProgressTrack className="h-1.5 bg-white/5">
+                        <ProgressIndicator className={cn("rounded-full", progressColor)} />
+                      </ProgressTrack>
+                    </Progress>
+                    <p className="mt-1.5 text-xs text-zinc-500">
                       {percent.toFixed(1)}% of total portfolio
                     </p>
                   </div>
@@ -431,7 +451,7 @@ export default function AccountsPage() {
 
       {/* Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl">
+        <DialogContent className="sm:max-w-md bg-zinc-900 border-white/5 rounded-xl shadow-2xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle className="text-white">
@@ -454,7 +474,7 @@ export default function AccountsPage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Main Checking"
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50"
+                  className="bg-zinc-950 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50"
                 />
               </div>
               {!editingAccount && (
@@ -468,11 +488,11 @@ export default function AccountsPage() {
                   >
                     <SelectTrigger
                       id="type"
-                      className="bg-white/5 border-white/10 text-white focus:ring-[#00d4aa]/50"
+                      className="bg-zinc-950 border-white/10 text-white focus:ring-[#00d4aa]/50"
                     >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-white/10">
+                    <SelectContent className="bg-zinc-900 border-white/10">
                       {Object.values(AccountType).map((t) => (
                         <SelectItem
                           key={t}
@@ -498,7 +518,7 @@ export default function AccountsPage() {
                   onChange={(e) => setBalance(e.target.value)}
                   placeholder="0.00"
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50"
+                  className="bg-zinc-950 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50"
                 />
               </div>
               {!editingAccount && (
@@ -508,18 +528,18 @@ export default function AccountsPage() {
                     type="checkbox"
                     checked={isDefault}
                     onChange={(e) => setIsDefault(e.target.checked)}
-                    className="h-4 w-4 rounded border-white/10 bg-white/5 text-[#00d4aa] focus:ring-[#00d4aa]/50"
+                    className="h-4 w-4 rounded border-white/10 bg-zinc-950 text-[#00d4aa] focus:ring-[#00d4aa]/50"
                   />
                   <Label
                     htmlFor="isDefault"
-                    className="font-normal text-white/80"
+                    className="font-normal text-zinc-300"
                   >
                     Set as default account
                   </Label>
                 </div>
               )}
             </div>
-            <DialogFooter className="bg-white/5">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -531,7 +551,7 @@ export default function AccountsPage() {
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="bg-[#00d4aa] text-slate-950 hover:bg-[#00d4aa]/90"
+                className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20"
               >
                 {editingAccount ? "Save Changes" : "Create Account"}
               </Button>

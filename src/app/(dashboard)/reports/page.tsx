@@ -39,7 +39,7 @@ import { FileSpreadsheet, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const COLORS = ["#00d4aa", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#6366f1"];
-const glassCard = "relative overflow-hidden border-0 bg-slate-800/50 backdrop-blur-xl ring-1 ring-white/10";
+const glassCard = "relative overflow-hidden border border-white/5 bg-zinc-900 rounded-xl";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -177,7 +177,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-100">Reports</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-white">Reports</h1>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -202,23 +202,23 @@ export default function ReportsPage() {
       <Card className={cn(glassCard)}>
         <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-end">
           <div className="space-y-2">
-            <Label htmlFor="startDate" className="text-slate-300">Start Date</Label>
+            <Label htmlFor="startDate" className="text-zinc-300">Start Date</Label>
             <Input
               id="startDate"
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="bg-slate-800 ring-1 ring-white/10"
+              className="border border-white/5 bg-zinc-800"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="endDate" className="text-slate-300">End Date</Label>
+            <Label htmlFor="endDate" className="text-zinc-300">End Date</Label>
             <Input
               id="endDate"
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="bg-slate-800 ring-1 ring-white/10"
+              className="border border-white/5 bg-zinc-800"
             />
           </div>
         </CardContent>
@@ -237,7 +237,7 @@ export default function ReportsPage() {
           <TabsContent value="spending" className="space-y-6">
             <Card className={cn(glassCard)}>
               <CardHeader>
-                <CardTitle className="text-slate-200">Spending by Category</CardTitle>
+                <CardTitle className="text-zinc-200">Spending by Category</CardTitle>
               </CardHeader>
               <CardContent>
                 {spendingData && spendingData.length > 0 ? (
@@ -263,7 +263,7 @@ export default function ReportsPage() {
                           ))}
                         </Pie>
                         <Tooltip
-                          contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
+                          contentStyle={{ backgroundColor: "#18181b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
                           formatter={(value: any) => formatCurrency(Number(value))}
                         />
                         <Legend wrapperStyle={{ color: "#94a3b8" }} />
@@ -276,18 +276,18 @@ export default function ReportsPage() {
                         return (
                           <div
                             key={item.name}
-                            className="flex items-center justify-between rounded-lg bg-slate-900/40 px-4 py-3 ring-1 ring-white/5"
+                            className="flex items-center justify-between rounded-lg bg-zinc-800/50 px-4 py-3 ring-1 ring-white/5"
                           >
                             <div className="flex items-center gap-3">
                               <div
                                 className="h-3 w-3 rounded-full"
                                 style={{ backgroundColor: item.color || COLORS[index % COLORS.length] }}
                               />
-                              <span className="font-medium text-slate-200">{item.name}</span>
+                              <span className="font-medium text-zinc-200">{item.name}</span>
                             </div>
                             <div className="text-right">
-                              <div className="font-semibold text-slate-200">{formatCurrency(item.total)}</div>
-                              <div className="text-xs text-slate-400">{percent.toFixed(1)}% of total</div>
+                              <div className="font-semibold text-zinc-200">{formatCurrency(item.total)}</div>
+                              <div className="text-xs text-zinc-400">{percent.toFixed(1)}% of total</div>
                             </div>
                           </div>
                         );
@@ -295,7 +295,7 @@ export default function ReportsPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="py-12 text-center text-slate-400">
+                  <div className="py-12 text-center text-zinc-400">
                     No spending data for the selected range.
                   </div>
                 )}
@@ -307,7 +307,7 @@ export default function ReportsPage() {
           <TabsContent value="income-expense" className="space-y-6">
             <Card className={cn(glassCard)}>
               <CardHeader>
-                <CardTitle className="text-slate-200">Income vs Expense</CardTitle>
+                <CardTitle className="text-zinc-200">Income vs Expense</CardTitle>
               </CardHeader>
               <CardContent>
                 {incomeExpenseData && incomeExpenseData.length > 0 ? (
@@ -318,7 +318,7 @@ export default function ReportsPage() {
                         <XAxis dataKey="month" stroke="#64748b" tick={{ fill: "#64748b" }} />
                         <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} stroke="#64748b" tick={{ fill: "#64748b" }} />
                         <Tooltip
-                          contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
+                          contentStyle={{ backgroundColor: "#18181b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
                           formatter={(value: any) => formatCurrency(Number(value))}
                         />
                         <Legend wrapperStyle={{ color: "#94a3b8" }} />
@@ -331,10 +331,10 @@ export default function ReportsPage() {
                       <Table>
                         <TableHeader>
                           <TableRow className="border-white/5 hover:bg-transparent">
-                            <TableHead className="text-slate-400">Month</TableHead>
-                            <TableHead className="text-right text-slate-400">Income</TableHead>
-                            <TableHead className="text-right text-slate-400">Expenses</TableHead>
-                            <TableHead className="text-right text-slate-400">Net</TableHead>
+                            <TableHead className="text-zinc-400">Month</TableHead>
+                            <TableHead className="text-right text-zinc-400">Income</TableHead>
+                            <TableHead className="text-right text-zinc-400">Expenses</TableHead>
+                            <TableHead className="text-right text-zinc-400">Net</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -342,7 +342,7 @@ export default function ReportsPage() {
                             const net = item.income - item.expense;
                             return (
                               <TableRow key={item.month} className="border-white/5">
-                                <TableCell className="font-medium text-slate-200">{item.month}</TableCell>
+                                <TableCell className="font-medium text-zinc-200">{item.month}</TableCell>
                                 <TableCell className="text-right text-emerald-400">{formatCurrency(item.income)}</TableCell>
                                 <TableCell className="text-right text-rose-400">{formatCurrency(item.expense)}</TableCell>
                                 <TableCell className={cn("text-right font-medium", net >= 0 ? "text-emerald-400" : "text-rose-400")}>
@@ -356,7 +356,7 @@ export default function ReportsPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="py-12 text-center text-slate-400">
+                  <div className="py-12 text-center text-zinc-400">
                     No income/expense data for the selected range.
                   </div>
                 )}
@@ -372,7 +372,7 @@ export default function ReportsPage() {
                 <Card className={cn(glassCard)}>
                   <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#00d4aa]/10 blur-2xl" />
                   <CardHeader className="relative pb-2">
-                    <CardTitle className="text-sm font-medium text-slate-400">Current Net Worth</CardTitle>
+                    <CardTitle className="text-sm font-medium text-zinc-400">Current Net Worth</CardTitle>
                   </CardHeader>
                   <CardContent className="relative">
                     <div className="text-2xl font-bold text-[#00d4aa]">{formatCurrency(currentNetWorth)}</div>
@@ -381,7 +381,7 @@ export default function ReportsPage() {
                 <Card className={cn(glassCard)}>
                   <div className={cn("absolute -right-6 -top-6 h-24 w-24 rounded-full blur-2xl", netWorthChange >= 0 ? "bg-emerald-500/10" : "bg-rose-500/10")} />
                   <CardHeader className="relative pb-2">
-                    <CardTitle className="text-sm font-medium text-slate-400">Change from Start</CardTitle>
+                    <CardTitle className="text-sm font-medium text-zinc-400">Change from Start</CardTitle>
                   </CardHeader>
                   <CardContent className="relative">
                     <div className={cn("text-2xl font-bold", netWorthChange >= 0 ? "text-emerald-400" : "text-rose-400")}>
@@ -393,12 +393,12 @@ export default function ReportsPage() {
                   </CardContent>
                 </Card>
                 <Card className={cn(glassCard)}>
-                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-slate-400/10 blur-2xl" />
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-zinc-700/50 blur-2xl" />
                   <CardHeader className="relative pb-2">
-                    <CardTitle className="text-sm font-medium text-slate-400">Data Points</CardTitle>
+                    <CardTitle className="text-sm font-medium text-zinc-400">Data Points</CardTitle>
                   </CardHeader>
                   <CardContent className="relative">
-                    <div className="text-2xl font-bold text-slate-200">{netWorthData.length} months</div>
+                    <div className="text-2xl font-bold text-zinc-200">{netWorthData.length} months</div>
                   </CardContent>
                 </Card>
               </div>
@@ -406,7 +406,7 @@ export default function ReportsPage() {
 
             <Card className={cn(glassCard)}>
               <CardHeader>
-                <CardTitle className="text-slate-200">Net Worth Trend</CardTitle>
+                <CardTitle className="text-zinc-200">Net Worth Trend</CardTitle>
               </CardHeader>
               <CardContent>
                 {netWorthData && netWorthData.length > 0 ? (
@@ -416,7 +416,7 @@ export default function ReportsPage() {
                       <XAxis dataKey="month" stroke="#64748b" tick={{ fill: "#64748b" }} />
                       <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} stroke="#64748b" tick={{ fill: "#64748b" }} />
                       <Tooltip
-                        contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
+                        contentStyle={{ backgroundColor: "#18181b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.5rem" }}
                         formatter={(value: any) => formatCurrency(Number(value))}
                       />
                       <Legend wrapperStyle={{ color: "#94a3b8" }} />
@@ -425,13 +425,13 @@ export default function ReportsPage() {
                         dataKey="netWorth"
                         stroke="#00d4aa"
                         strokeWidth={2}
-                        dot={{ r: 4, fill: "#0f172a", stroke: "#00d4aa", strokeWidth: 2 }}
+                        dot={{ r: 4, fill: "#18181b", stroke: "#00d4aa", strokeWidth: 2 }}
                         name="Net Worth"
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="py-12 text-center text-slate-400">
+                  <div className="py-12 text-center text-zinc-400">
                     No net worth data available.
                   </div>
                 )}

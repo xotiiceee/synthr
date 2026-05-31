@@ -32,6 +32,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { TransactionType, CategoryType } from "@prisma/client";
 import {
@@ -43,6 +44,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ArrowLeftRight,
+  Filter,
 } from "lucide-react";
 
 /* ─── Types ─── */
@@ -257,7 +259,7 @@ function TransactionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl">
+      <DialogContent className="sm:max-w-lg bg-zinc-900 border-white/5 rounded-xl shadow-2xl">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle className="text-white">{isEditing ? "Edit Transaction" : "Add Transaction"}</DialogTitle>
@@ -268,8 +270,8 @@ function TransactionDialog({
               <Label htmlFor="type" className="text-white">Type</Label>
               <Controller name="type" control={control} render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="type" className="bg-white/5 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-white/10">
+                  <SelectTrigger id="type" className="bg-zinc-900 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-white/10">
                     <SelectItem value="INCOME" className="text-white focus:bg-white/10">Income</SelectItem>
                     <SelectItem value="EXPENSE" className="text-white focus:bg-white/10">Expense</SelectItem>
                     <SelectItem value="TRANSFER" className="text-white focus:bg-white/10">Transfer</SelectItem>
@@ -281,30 +283,30 @@ function TransactionDialog({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="amount" className="text-white">Amount</Label>
-                <Input id="amount" type="number" step="0.01" {...register("amount", { valueAsNumber: true })} placeholder="0.00" className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
+                <Input id="amount" type="number" step="0.01" {...register("amount", { valueAsNumber: true })} placeholder="0.00" className="bg-zinc-900 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
                 {errors.amount && <p className="text-xs text-red-400">{errors.amount.message}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="date" className="text-white">Date</Label>
-                <Input id="date" type="date" {...register("date")} className="bg-white/5 border-white/10 text-white focus-visible:ring-[#00d4aa]/50 [color-scheme:dark]" />
+                <Input id="date" type="date" {...register("date")} className="bg-zinc-900 border-white/10 text-white focus-visible:ring-[#00d4aa]/50 [color-scheme:dark]" />
                 {errors.date && <p className="text-xs text-red-400">{errors.date.message}</p>}
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="description" className="text-white">Description</Label>
-              <Input id="description" {...register("description")} placeholder="e.g. Grocery shopping" className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
+              <Input id="description" {...register("description")} placeholder="e.g. Grocery shopping" className="bg-zinc-900 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
               {errors.description && <p className="text-xs text-red-400">{errors.description.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-white">Notes</Label>
-              <Input id="notes" {...register("notes")} placeholder="Optional notes..." className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
+              <Input id="notes" {...register("notes")} placeholder="Optional notes..." className="bg-zinc-900 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="accountId" className="text-white">{selectedType === "TRANSFER" ? "From Account" : "Account"}</Label>
               <Controller name="accountId" control={control} render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="accountId" className="bg-white/5 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue placeholder="Select account" /></SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-white/10">
+                  <SelectTrigger id="accountId" className="bg-zinc-900 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue placeholder="Select account" /></SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-white/10">
                     {accounts.map((acc) => <SelectItem key={acc.id} value={acc.id} className="text-white focus:bg-white/10">{acc.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -316,8 +318,8 @@ function TransactionDialog({
                 <Label htmlFor="toAccountId" className="text-white">To Account</Label>
                 <Controller name="toAccountId" control={control} render={({ field }) => (
                   <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                    <SelectTrigger id="toAccountId" className="bg-white/5 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue placeholder="Select destination account" /></SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-white/10">
+                    <SelectTrigger id="toAccountId" className="bg-zinc-900 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue placeholder="Select destination account" /></SelectTrigger>
+                    <SelectContent className="bg-zinc-900 border-white/10">
                       {accounts.filter((a) => a.id !== watch("accountId")).map((acc) => <SelectItem key={acc.id} value={acc.id} className="text-white focus:bg-white/10">{acc.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
@@ -328,8 +330,8 @@ function TransactionDialog({
               <Label htmlFor="categoryId" className="text-white">Category</Label>
               <Controller name="categoryId" control={control} render={({ field }) => (
                 <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                  <SelectTrigger id="categoryId" className="bg-white/5 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue placeholder="Select category" /></SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-white/10">
+                  <SelectTrigger id="categoryId" className="bg-zinc-900 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue placeholder="Select category" /></SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-white/10">
                     {filteredCategories.map((cat) => <SelectItem key={cat.id} value={cat.id} className="text-white focus:bg-white/10">{cat.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -342,7 +344,7 @@ function TransactionDialog({
                 {tags.map((tag) => {
                   const isSelected = selectedTagIds.includes(tag.id);
                   return (
-                    <button key={tag.id} type="button" onClick={() => toggleTag(tag.id)} className={cn("rounded-full px-2.5 py-1 text-xs border transition-colors", isSelected ? "bg-[#00d4aa] text-slate-950 border-[#00d4aa]" : "bg-transparent text-muted-foreground border-white/10 hover:border-[#00d4aa]/50")}>
+                    <button key={tag.id} type="button" onClick={() => toggleTag(tag.id)} className={cn("rounded-full px-2.5 py-1 text-xs border transition-colors", isSelected ? "bg-[#00d4aa] text-black border-[#00d4aa]" : "bg-transparent text-muted-foreground border-white/10 hover:border-[#00d4aa]/50")}>
                       {tag.name}
                     </button>
                   );
@@ -350,9 +352,9 @@ function TransactionDialog({
               </div>
             </div>
           </div>
-          <DialogFooter className="bg-white/5">
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-white/10 text-white hover:bg-white/10 hover:text-white">Cancel</Button>
-            <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="bg-[#00d4aa] text-slate-950 hover:bg-[#00d4aa]/90">
+            <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20">
               {isEditing ? <><Pencil className="mr-2 h-4 w-4" />Save Changes</> : <><Plus className="mr-2 h-4 w-4" />Add Transaction</>}
             </Button>
           </DialogFooter>
@@ -444,26 +446,26 @@ export default function TransactionsPage() {
           <h1 className="text-3xl font-semibold tracking-tight text-white">Transactions</h1>
           <p className="text-muted-foreground">Manage your income, expenses, and transfers.</p>
         </div>
-        <Button onClick={openCreate} className="bg-[#00d4aa] text-slate-950 hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20">
+        <Button onClick={openCreate} className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90 shadow-lg shadow-[#00d4aa]/20">
           <Plus className="mr-2 h-4 w-4" />Add Transaction
         </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white/5 border border-white/10 p-1 rounded-xl backdrop-blur-md">
-          <TabsTrigger value="transactions" className="rounded-lg data-[state=active]:bg-[#00d4aa] data-[state=active]:text-slate-950 data-[state=active]:shadow-sm">Transactions</TabsTrigger>
-          <TabsTrigger value="categories" className="rounded-lg data-[state=active]:bg-[#00d4aa] data-[state=active]:text-slate-950 data-[state=active]:shadow-sm">Categories & Tags</TabsTrigger>
+        <TabsList className="bg-zinc-900 border border-white/5 p-1 rounded-xl">
+          <TabsTrigger value="transactions" className="rounded-lg data-[state=active]:bg-[#00d4aa] data-[state=active]:text-black data-[state=active]:shadow-sm">Transactions</TabsTrigger>
+          <TabsTrigger value="categories" className="rounded-lg data-[state=active]:bg-[#00d4aa] data-[state=active]:text-black data-[state=active]:shadow-sm">Categories & Tags</TabsTrigger>
         </TabsList>
 
         <TabsContent value="transactions" className="mt-6 space-y-6">
           {/* Filter Bar */}
-          <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-4 md:p-5 shadow-sm">
+          <div className="rounded-xl bg-zinc-900 border border-white/5 p-4 md:p-5 shadow-sm">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground uppercase tracking-wider">Type</Label>
                 <Select value={filterType} onValueChange={(v) => { if (v !== null) setFilterType(v as typeof filterType); }}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-foreground hover:bg-white/10 focus:ring-[#00d4aa]/50"><SelectValue placeholder="All types" /></SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-white/10">
+                  <SelectTrigger className="bg-zinc-950 border-white/10 text-white hover:bg-zinc-950/80 focus:ring-[#00d4aa]/50"><SelectValue placeholder="All types" /></SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-white/10">
                     <SelectItem value="ALL" className="text-white focus:bg-white/10">All types</SelectItem>
                     <SelectItem value="INCOME" className="text-white focus:bg-white/10">Income</SelectItem>
                     <SelectItem value="EXPENSE" className="text-white focus:bg-white/10">Expense</SelectItem>
@@ -474,8 +476,8 @@ export default function TransactionsPage() {
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground uppercase tracking-wider">Account</Label>
                 <Select value={filterAccountId} onValueChange={(v) => { if (v !== null) setFilterAccountId(v); }}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-foreground hover:bg-white/10 focus:ring-[#00d4aa]/50"><SelectValue placeholder="All accounts" /></SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-white/10">
+                  <SelectTrigger className="bg-zinc-950 border-white/10 text-white hover:bg-zinc-950/80 focus:ring-[#00d4aa]/50"><SelectValue placeholder="All accounts" /></SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-white/10">
                     <SelectItem value="" className="text-white focus:bg-white/10">All accounts</SelectItem>
                     {accounts.map((acc) => <SelectItem key={acc.id} value={acc.id} className="text-white focus:bg-white/10">{acc.name}</SelectItem>)}
                   </SelectContent>
@@ -484,8 +486,8 @@ export default function TransactionsPage() {
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground uppercase tracking-wider">Category</Label>
                 <Select value={filterCategoryId} onValueChange={(v) => { if (v !== null) setFilterCategoryId(v); }}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-foreground hover:bg-white/10 focus:ring-[#00d4aa]/50"><SelectValue placeholder="All categories" /></SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-white/10">
+                  <SelectTrigger className="bg-zinc-950 border-white/10 text-white hover:bg-zinc-950/80 focus:ring-[#00d4aa]/50"><SelectValue placeholder="All categories" /></SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-white/10">
                     <SelectItem value="" className="text-white focus:bg-white/10">All categories</SelectItem>
                     {categories.map((cat) => <SelectItem key={cat.id} value={cat.id} className="text-white focus:bg-white/10">{cat.name}</SelectItem>)}
                   </SelectContent>
@@ -493,17 +495,17 @@ export default function TransactionsPage() {
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground uppercase tracking-wider">From</Label>
-                <Input type="date" value={filterStartDate} onChange={(e) => setFilterStartDate(e.target.value)} className="bg-white/5 border-white/10 text-foreground focus-visible:ring-[#00d4aa]/50 [color-scheme:dark]" />
+                <Input type="date" value={filterStartDate} onChange={(e) => setFilterStartDate(e.target.value)} className="bg-zinc-950 border-white/10 text-white focus-visible:ring-[#00d4aa]/50 [color-scheme:dark]" />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground uppercase tracking-wider">To</Label>
-                <Input type="date" value={filterEndDate} onChange={(e) => setFilterEndDate(e.target.value)} className="bg-white/5 border-white/10 text-foreground focus-visible:ring-[#00d4aa]/50 [color-scheme:dark]" />
+                <Input type="date" value={filterEndDate} onChange={(e) => setFilterEndDate(e.target.value)} className="bg-zinc-950 border-white/10 text-white focus-visible:ring-[#00d4aa]/50 [color-scheme:dark]" />
               </div>
               <div className="space-y-1.5 lg:col-span-2">
                 <Label className="text-xs text-muted-foreground uppercase tracking-wider">Search</Label>
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search transactions..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
+                  <Input placeholder="Search transactions..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 bg-zinc-950 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
                 </div>
               </div>
             </div>
@@ -514,13 +516,18 @@ export default function TransactionsPage() {
 
           {/* Table */}
           {txLoading ? (
-            <div className="rounded-2xl bg-white/5 border border-white/10 p-8 text-center text-muted-foreground">Loading transactions...</div>
+            <div className="rounded-xl bg-zinc-900 border border-white/5 p-8 text-center text-muted-foreground">Loading transactions...</div>
           ) : filteredRows.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-8 text-center"><p className="text-muted-foreground">No transactions found. Add one to get started.</p></div>
+            <div className="rounded-xl border border-dashed border-white/10 bg-zinc-900/50 p-12 text-center">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 mb-4">
+                <Filter className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <p className="text-muted-foreground">No transactions yet. Add your first one.</p>
+            </div>
           ) : (
-            <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 overflow-hidden">
+            <div className="rounded-xl bg-zinc-900 border border-white/5 overflow-hidden">
               <Table>
-                <TableHeader className="bg-white/5">
+                <TableHeader>
                   <TableRow className="border-b border-white/5 hover:bg-transparent">
                     <TableHead className="text-muted-foreground text-xs uppercase tracking-wider font-medium py-3 px-4">Date</TableHead>
                     <TableHead className="text-muted-foreground text-xs uppercase tracking-wider font-medium py-3 px-4">Description</TableHead>
@@ -534,35 +541,45 @@ export default function TransactionsPage() {
                     const amount = Number(tx.amount);
                     const isIncome = tx.type === "INCOME";
                     const isExpense = tx.type === "EXPENSE";
-                    const amountColor = isIncome ? "text-emerald-400" : isExpense ? "text-red-400" : "text-muted-foreground";
+                    const amountColor = isIncome ? "text-emerald-400" : isExpense ? "text-red-400" : "text-zinc-400";
                     const sign = isIncome ? "+" : isExpense ? "-" : "";
                     const TypeIcon = isIncome ? ArrowUpRight : isExpense ? ArrowDownRight : ArrowLeftRight;
                     return (
-                      <TableRow key={tx.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                        <TableCell className="py-3 px-4 text-muted-foreground whitespace-nowrap">{formatDate(tx.date)}</TableCell>
+                      <TableRow key={tx.id} className="group border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                        <TableCell className="py-3 px-4 text-zinc-400 whitespace-nowrap text-sm">{formatDate(tx.date)}</TableCell>
                         <TableCell className="py-3 px-4">
                           <div className="flex flex-col gap-1">
                             <span className="font-medium text-white">{tx.description}</span>
-                            <div className="flex items-center gap-2 flex-wrap">
+                            <div className="flex items-center gap-1.5 flex-wrap">
                               {tx.category && (
-                                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border" style={{ backgroundColor: tx.category.color ? `${tx.category.color}20` : "rgba(0,212,170,0.15)", color: tx.category.color ?? "#00d4aa", borderColor: tx.category.color ? `${tx.category.color}30` : "rgba(0,212,170,0.25)" }}>{tx.category.name}</span>
+                                <Badge
+                                  variant="outline"
+                                  className="gap-1 border-0 py-0 px-1.5 text-[10px] font-medium"
+                                  style={{ backgroundColor: tx.category.color ? `${tx.category.color}15` : "rgba(0,212,170,0.12)", color: tx.category.color ?? "#00d4aa" }}
+                                >
+                                  {tx.category.name}
+                                </Badge>
                               )}
-                              {tx.tags.map((t) => <span key={t.tagId} className="rounded-full px-1.5 py-0.5 text-[10px] border border-white/10 text-muted-foreground bg-white/5">{t.tag.name}</span>)}
+                              {tx.tags.map((t) => (
+                                <span key={t.tagId} className="rounded-full px-1.5 py-px text-[10px] border border-white/10 text-zinc-400 bg-zinc-800/50">
+                                  {t.tag.name}
+                                </span>
+                              ))}
                             </div>
-                            {tx.notes && <span className="text-xs text-muted-foreground">{tx.notes}</span>}
+                            {tx.notes && <span className="text-xs text-zinc-500">{tx.notes}</span>}
                           </div>
                         </TableCell>
-                        <TableCell className="py-3 px-4 text-sm text-white/80">
+                        <TableCell className="py-3 px-4 text-sm text-zinc-300">
                           <div>{tx.account?.name ?? "-"}</div>
-                          {tx.toAccountId && <div className="text-xs text-muted-foreground mt-0.5">to {accounts.find((a) => a.id === tx.toAccountId)?.name ?? "-"}</div>}
+                          {tx.toAccountId && <div className="text-xs text-zinc-500 mt-0.5">to {accounts.find((a) => a.id === tx.toAccountId)?.name ?? "-"}</div>}
                         </TableCell>
-                        <TableCell className={cn("py-3 px-4 text-right font-bold tabular-nums", amountColor)}>
+                        <TableCell className={cn("py-3 px-4 text-right font-semibold tabular-nums", amountColor)}>
                           <div className="flex items-center justify-end gap-1.5"><TypeIcon className={cn("h-3.5 w-3.5", amountColor)} />{sign}{formatCurrency(amount)}</div>
                         </TableCell>
                         <TableCell className="py-3 px-4">
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon-sm" onClick={() => openEdit(tx)} className="text-muted-foreground hover:text-white hover:bg-white/10"><Pencil className="h-4 w-4" /></Button>
-                            <Button variant="ghost" size="icon-sm" onClick={() => { if (confirm("Are you sure you want to delete this transaction?")) deleteMutation.mutate(tx.id); }} className="text-muted-foreground hover:text-red-400 hover:bg-red-400/10"><Trash2 className="h-4 w-4" /></Button>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon-sm" onClick={() => openEdit(tx)} className="text-zinc-400 hover:text-white hover:bg-white/10"><Pencil className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon-sm" onClick={() => { if (confirm("Are you sure you want to delete this transaction?")) deleteMutation.mutate(tx.id); }} className="text-zinc-400 hover:text-red-400 hover:bg-red-400/10"><Trash2 className="h-4 w-4" /></Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -580,16 +597,16 @@ export default function TransactionsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-white">Categories</h2>
-              <Button size="sm" onClick={() => setCatDialogOpen(true)} className="bg-[#00d4aa] text-slate-950 hover:bg-[#00d4aa]/90"><Plus className="mr-1 h-4 w-4" />Add Category</Button>
+              <Button size="sm" onClick={() => setCatDialogOpen(true)} className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"><Plus className="mr-1 h-4 w-4" />Add Category</Button>
             </div>
             {catsLoading ? (
               <div className="text-muted-foreground">Loading categories...</div>
             ) : cats.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-6 text-center text-sm text-muted-foreground">No categories yet.</div>
+              <div className="rounded-xl border border-dashed border-white/10 bg-zinc-900/50 p-6 text-center text-sm text-muted-foreground">No categories yet.</div>
             ) : (
-              <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 overflow-hidden">
+              <div className="rounded-xl bg-zinc-900 border border-white/5 overflow-hidden">
                 <Table>
-                  <TableHeader className="bg-white/5">
+                  <TableHeader>
                     <TableRow className="border-b border-white/5 hover:bg-transparent">
                       <TableHead className="text-muted-foreground text-xs uppercase tracking-wider font-medium py-3 px-4">Name</TableHead>
                       <TableHead className="text-muted-foreground text-xs uppercase tracking-wider font-medium py-3 px-4">Type</TableHead>
@@ -599,23 +616,23 @@ export default function TransactionsPage() {
                   </TableHeader>
                   <TableBody>
                     {cats.map((cat) => (
-                      <TableRow key={cat.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <TableRow key={cat.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
                         <TableCell className="py-3 px-4 font-medium text-white">{cat.name}</TableCell>
                         <TableCell className="py-3 px-4">
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border ${cat.type === "INCOME" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>{cat.type}</span>
+                          <Badge variant="outline" className={cn("text-[10px] border-0", cat.type === "INCOME" ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400")}>{cat.type}</Badge>
                         </TableCell>
                         <TableCell className="py-3 px-4">
                           {cat.color ? (
                             <div className="flex items-center gap-2">
                               <div className="h-4 w-4 rounded-full border border-white/10" style={{ backgroundColor: cat.color }} />
-                              <span className="text-xs text-muted-foreground">{cat.color}</span>
+                              <span className="text-xs text-zinc-400">{cat.color}</span>
                             </div>
                           ) : (
-                            <span className="text-muted-foreground">-</span>
+                            <span className="text-zinc-500">-</span>
                           )}
                         </TableCell>
                         <TableCell className="py-3 px-4">
-                          <Button variant="ghost" size="icon-sm" onClick={() => { if (confirm("Are you sure you want to delete this category?")) deleteCatMutation.mutate(cat.id); }} className="text-muted-foreground hover:text-red-400 hover:bg-red-400/10"><Trash2 className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon-sm" onClick={() => { if (confirm("Are you sure you want to delete this category?")) deleteCatMutation.mutate(cat.id); }} className="text-zinc-400 hover:text-red-400 hover:bg-red-400/10"><Trash2 className="h-4 w-4" /></Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -629,19 +646,19 @@ export default function TransactionsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-white">Tags</h2>
-              <Button size="sm" onClick={() => setTagDialogOpen(true)} className="bg-[#00d4aa] text-slate-950 hover:bg-[#00d4aa]/90"><Tag className="mr-1 h-4 w-4" />Add Tag</Button>
+              <Button size="sm" onClick={() => setTagDialogOpen(true)} className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90"><Tag className="mr-1 h-4 w-4" />Add Tag</Button>
             </div>
             {tagsLoading ? (
               <div className="text-muted-foreground">Loading tags...</div>
             ) : tagsList.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-6 text-center text-sm text-muted-foreground">No tags yet.</div>
+              <div className="rounded-xl border border-dashed border-white/10 bg-zinc-900/50 p-6 text-center text-sm text-muted-foreground">No tags yet.</div>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {tagsList.map((tag) => (
-                  <div key={tag.id} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/80 backdrop-blur-sm hover:bg-white/10 transition-colors">
+                  <div key={tag.id} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-800/50 px-3 py-1.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors">
                     {tag.color && <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: tag.color }} />}
                     <span>{tag.name}</span>
-                    <button type="button" onClick={() => { if (confirm("Are you sure you want to delete this tag?")) deleteTagMutation.mutate(tag.id); }} className="ml-1 text-muted-foreground hover:text-red-400 transition-colors"><Trash2 className="h-3 w-3" /></button>
+                    <button type="button" onClick={() => { if (confirm("Are you sure you want to delete this tag?")) deleteTagMutation.mutate(tag.id); }} className="ml-1 text-zinc-400 hover:text-red-400 transition-colors"><Trash2 className="h-3 w-3" /></button>
                   </div>
                 ))}
               </div>
@@ -652,7 +669,7 @@ export default function TransactionsPage() {
 
       {/* Add Category Dialog */}
       <Dialog open={catDialogOpen} onOpenChange={setCatDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl">
+        <DialogContent className="sm:max-w-md bg-zinc-900 border-white/5 rounded-xl shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-white">Add Category</DialogTitle>
             <DialogDescription>Create a new income or expense category.</DialogDescription>
@@ -660,13 +677,13 @@ export default function TransactionsPage() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="catName" className="text-white">Name</Label>
-              <Input id="catName" value={newCatName} onChange={(e) => setNewCatName(e.target.value)} placeholder="e.g. Dining Out" className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
+              <Input id="catName" value={newCatName} onChange={(e) => setNewCatName(e.target.value)} placeholder="e.g. Dining Out" className="bg-zinc-950 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="catType" className="text-white">Type</Label>
               <Select value={newCatType} onValueChange={(v) => setNewCatType(v as CategoryType)}>
-                <SelectTrigger id="catType" className="bg-white/5 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-slate-900 border-white/10">
+                <SelectTrigger id="catType" className="bg-zinc-950 border-white/10 text-white focus:ring-[#00d4aa]/50"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-zinc-900 border-white/10">
                   <SelectItem value="INCOME" className="text-white focus:bg-white/10">Income</SelectItem>
                   <SelectItem value="EXPENSE" className="text-white focus:bg-white/10">Expense</SelectItem>
                 </SelectContent>
@@ -675,21 +692,21 @@ export default function TransactionsPage() {
             <div className="space-y-2">
               <Label htmlFor="catColor" className="text-white">Color</Label>
               <div className="flex items-center gap-2">
-                <Input id="catColor" type="color" value={newCatColor || "#00d4aa"} onChange={(e) => setNewCatColor(e.target.value)} className="h-8 w-12 px-1 bg-white/5 border-white/10" />
+                <Input id="catColor" type="color" value={newCatColor || "#00d4aa"} onChange={(e) => setNewCatColor(e.target.value)} className="h-8 w-12 px-1 bg-zinc-950 border-white/10" />
                 <span className="text-xs text-muted-foreground">Optional brand color</span>
               </div>
             </div>
           </div>
-          <DialogFooter className="bg-white/5">
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setCatDialogOpen(false)} className="border-white/10 text-white hover:bg-white/10 hover:text-white">Cancel</Button>
-            <Button type="button" disabled={createCatMutation.isPending || !newCatName.trim()} onClick={() => createCatMutation.mutate({ name: newCatName.trim(), type: newCatType, color: newCatColor || undefined })} className="bg-[#00d4aa] text-slate-950 hover:bg-[#00d4aa]/90">Create Category</Button>
+            <Button type="button" disabled={createCatMutation.isPending || !newCatName.trim()} onClick={() => createCatMutation.mutate({ name: newCatName.trim(), type: newCatType, color: newCatColor || undefined })} className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90">Create Category</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Add Tag Dialog */}
       <Dialog open={tagDialogOpen} onOpenChange={setTagDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl">
+        <DialogContent className="sm:max-w-md bg-zinc-900 border-white/5 rounded-xl shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-white">Add Tag</DialogTitle>
             <DialogDescription>Create a new tag.</DialogDescription>
@@ -697,19 +714,19 @@ export default function TransactionsPage() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="tagName" className="text-white">Name</Label>
-              <Input id="tagName" value={newTagName} onChange={(e) => setNewTagName(e.target.value)} placeholder="e.g. Work" className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
+              <Input id="tagName" value={newTagName} onChange={(e) => setNewTagName(e.target.value)} placeholder="e.g. Work" className="bg-zinc-950 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-[#00d4aa]/50" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="tagColor" className="text-white">Color</Label>
               <div className="flex items-center gap-2">
-                <Input id="tagColor" type="color" value={newTagColor || "#00d4aa"} onChange={(e) => setNewTagColor(e.target.value)} className="h-8 w-12 px-1 bg-white/5 border-white/10" />
+                <Input id="tagColor" type="color" value={newTagColor || "#00d4aa"} onChange={(e) => setNewTagColor(e.target.value)} className="h-8 w-12 px-1 bg-zinc-950 border-white/10" />
                 <span className="text-xs text-muted-foreground">Optional brand color</span>
               </div>
             </div>
           </div>
-          <DialogFooter className="bg-white/5">
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setTagDialogOpen(false)} className="border-white/10 text-white hover:bg-white/10 hover:text-white">Cancel</Button>
-            <Button type="button" disabled={createTagMutation.isPending || !newTagName.trim()} onClick={() => createTagMutation.mutate({ name: newTagName.trim(), color: newTagColor || undefined })} className="bg-[#00d4aa] text-slate-950 hover:bg-[#00d4aa]/90">Create Tag</Button>
+            <Button type="button" disabled={createTagMutation.isPending || !newTagName.trim()} onClick={() => createTagMutation.mutate({ name: newTagName.trim(), color: newTagColor || undefined })} className="bg-[#00d4aa] text-black hover:bg-[#00d4aa]/90">Create Tag</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
