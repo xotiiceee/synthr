@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -12,17 +12,17 @@ const setupSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  console.log("Setup API session:", session ? "authenticated" : "none");
-  if (!session?.user?.id) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  
+  if (!token?.sub) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  const userId = token.sub;
 
   try {
     const body = await req.json();
     const data = setupSchema.parse(body);
-
-    const userId = session.user.id;
 
     await prisma.$transaction(async (tx) => {
       // Create accounts
@@ -84,8 +84,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Setup error:", error);
-    return NextResponse.json({ message: "Setup failed" }, { status: 500 });
+    return NextResponse.json({ message: error.message || "Setup failed" }, { status: 500 });
   }
 }

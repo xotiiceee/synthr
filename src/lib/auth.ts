@@ -1,11 +1,9 @@
 import { compare, hash } from "bcryptjs";
 import { NextAuthOptions, getServerSession } from "next-auth";
+import { getToken } from "next-auth/jwt";
+import { NextRequest } from "next/server";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
-
-export async function auth() {
-  return getServerSession(authOptions);
-}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -43,13 +41,18 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.sub = user.id;
+        token.name = user.name;
+        token.email = user.email;
         token.setupComplete = user.setupComplete;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.sub as string;
+        session.user.name = token.name;
+        session.user.email = token.email;
         session.user.setupComplete = token.setupComplete as boolean;
       }
       return session;
@@ -63,6 +66,22 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
 };
+
+export async function auth(req?: NextRequest) {
+  if (req) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token?.sub) return null;
+    return {
+      user: {
+        id: token.sub as string,
+        name: token.name as string,
+        email: token.email as string,
+        setupComplete: token.setupComplete as boolean,
+      },
+    };
+  }
+  return getServerSession(authOptions);
+}
 
 export async function hashPassword(password: string) {
   return hash(password, 12);
