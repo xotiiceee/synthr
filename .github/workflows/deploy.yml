@@ -32,6 +32,8 @@ jobs:
         run: |
           cp -r .next/static .next/standalone/.next/
           cp -r public .next/standalone/
+          mkdir -p .next/standalone/.next/server
+          cp .next/server/middleware-manifest.json .next/standalone/.next/server/ 2>/dev/null || true
 
       - name: Create deployment archive
         run: |
@@ -81,6 +83,7 @@ jobs:
             pm2 start ecosystem.config.js 2>/dev/null || pm2 reload synthr --update-env
 
             echo "==> Cleaning up..."
+            rm -rf /opt/synthr/node_modules 2>/dev/null || true
             rm /tmp/deploy.tar.gz
 
             echo "==> Deploy complete!"
