@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Wallet, PiggyBank, TrendingUp, TrendingDown, Receipt, AlertTriangle,
   CheckCircle2, Lightbulb, Sparkles, Target, Coffee, DollarSign, Calendar,
@@ -29,13 +28,9 @@ export default function BudgetPlannerPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
+        <div className="h-8 w-48 bg-slate-800 rounded animate-pulse" />
         <div className="grid gap-4 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-32" />)}
-        </div>
-        <div className="grid gap-6 md:grid-cols-2">
-          <Skeleton className="h-80" />
-          <Skeleton className="h-80" />
+          {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-slate-800 rounded animate-pulse" />)}
         </div>
       </div>
     );
@@ -139,7 +134,7 @@ export default function BudgetPlannerPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{ background: "#1e293b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px" }}
-                    formatter={(val: number) => fmt(val)}
+                    formatter={(value: any) => fmt(Number(value))}
                   />
                 </PieChart>
               </ResponsiveContainer>
