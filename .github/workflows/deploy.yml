@@ -51,53 +51,71 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
         run: |
           mkdir -p ~/.ssh
-          echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 700 ~/.ssh
+
+          # Write key with exact formatting (critical for Windows-generated keys)
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+
+          # Debug: show key fingerprint (never exposes the key itself)
+          ssh-keygen -l -f ~/.ssh/deploy_key || echo "Key fingerprint check skipped"
+
+          # Add host key
           ssh-keyscan -H "$VPS_IP" >> ~/.ssh/known_hosts 2>/dev/null || true
-          cat >> ~/.ssh/config <<EOF
+
+          # Write SSH config
+          cat > ~/.ssh/config <<EOF
           Host vps
             HostName $VPS_IP
             User $VPS_USER
             IdentityFile ~/.ssh/deploy_key
             StrictHostKeyChecking accept-new
+            UserKnownHostsFile ~/.ssh/known_hosts
+            IdentitiesOnly yes
+            LogLevel ERROR
           EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Test SSH connection
+        run: |
+          echo "Testing SSH connection..."
+          ssh vps "echo 'SSH connection successful'" || exit 1
 
       - name: Deploy to VPS
-        env:
-          VPS_IP: ${{ secrets.VPS_IP }}
         run: |
-          scp deploy.tar.gz vps:/tmp/
-          ssh vps "
+          echo "Uploading deploy.tar.gz..."
+          scp -v deploy.tar.gz vps:/tmp/ 2>&1 | tail -20
+
+          echo "Running remote deploy..."
+          ssh vps '
             set -e
             cd /var/www/synthr
 
-            echo '==> Stopping app...'
+            echo "==> Stopping app..."
             pm2 stop synthr 2>/dev/null || true
 
-            echo '==> Backing up old build...'
+            echo "==> Backing up old build..."
             rm -rf .next/standalone-prev
             mv .next/standalone .next/standalone-prev 2>/dev/null || true
 
-            echo '==> Extracting new build...'
+            echo "==> Extracting new build..."
             tar -xzf /tmp/deploy.tar.gz
 
-            echo '==> Running database migrations...'
+            echo "==> Running database migrations..."
             which prisma > /dev/null || npm install -g prisma
             prisma migrate deploy
 
-            echo '==> Restarting app...'
+            echo "==> Restarting app..."
             pm2 start ecosystem.config.js 2>/dev/null || pm2 reload synthr
 
-            echo '==> Cleaning up...'
+            echo "==> Cleaning up..."
             rm /tmp/deploy.tar.gz
 
-            echo '==> Deploy complete!'
-          "
+            echo "==> Deploy complete!"
+          '
 
       - name: Health check
-        env:
-          VPS_IP: ${{ secrets.VPS_IP }}
         run: |
           sleep 5
           echo "Checking app health..."
-          curl -sf http://${VPS_IP}:3000 > /dev/null && echo "App is responding!" || echo "Health check inconclusive (app may still be starting)"
+          curl -sf http://${{ secrets.VPS_IP }}:3000 > /dev/null && echo "App is responding!" || echo "Health check inconclusive (app may still be starting)"
