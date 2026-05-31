@@ -1,21 +1,33 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const prismaClientSingleton = () => {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    console.warn("DATABASE_URL is not set. Prisma client may not work.");
+let prismaInstance: PrismaClient | undefined;
+
+function getPrisma(): PrismaClient {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+  if (prismaInstance) return prismaInstance;
+
+  try {
+    const { PrismaPg } = require("@prisma/adapter-pg");
+    const { Pool } = require("pg");
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL || "" });
+    const adapter = new PrismaPg(pool);
+    const client = new PrismaClient({ adapter });
+    globalForPrisma.prisma = client;
+    return client;
+  } catch {
+    const client = new PrismaClient();
+    globalForPrisma.prisma = client;
+    return client;
   }
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaPg(pool);
-  return new PrismaClient({ adapter });
-};
+}
 
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_, prop: string | symbol) {
+    const client = getPrisma();
+    return (client as any)[prop];
+  },
+});

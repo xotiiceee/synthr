@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { TrendingUp, PiggyBank, Wallet, Receipt, BarChart3, Shield, ArrowRight, Sparkles, Layers, Zap, Users } from "lucide-react";
+import { TrendingUp, PiggyBank, Wallet, Receipt, BarChart3, Shield, ArrowRight, Sparkles } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default async function RootPage() {
   const session = await auth();
