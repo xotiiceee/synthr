@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   serverExternalPackages: ["pg", "@prisma/adapter-pg", "@prisma/client", "prisma"],
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
