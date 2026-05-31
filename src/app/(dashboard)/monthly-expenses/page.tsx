@@ -168,7 +168,7 @@ export default function MonthlyExpensesPage() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recurring Bills</CardTitle>
                 <Dialog>
-                  <DialogTrigger asChild>
+                  <DialogTrigger>
                     <Button size="sm" className="bg-[#00d4aa] text-black font-semibold hover:shadow-[0_0_20px_rgba(0,212,170,0.15)]">
                       <Plus className="h-4 w-4 mr-1" /> Add
                     </Button>
@@ -221,7 +221,7 @@ export default function MonthlyExpensesPage() {
                         </div>
                       </div>
                       <DialogFooter>
-                        <DialogClose asChild>
+                        <DialogClose>
                           <Button type="button" variant="ghost">Cancel</Button>
                         </DialogClose>
                         <Button type="submit" className="bg-[#00d4aa] text-black font-semibold">Add Bill</Button>
@@ -235,7 +235,7 @@ export default function MonthlyExpensesPage() {
                   <div className="py-8 text-center">
                     <p className="text-sm text-zinc-400">No recurring bills set up</p>
                     <Dialog>
-                      <DialogTrigger asChild>
+                      <DialogTrigger>
                         <Button variant="link" className="text-[#00d4aa] mt-2">Add your first recurring bill</Button>
                       </DialogTrigger>
                       <DialogContent className="bg-zinc-900 border-white/5 sm:max-w-md">
@@ -279,7 +279,7 @@ export default function MonthlyExpensesPage() {
                             </div>
                           </div>
                           <DialogFooter>
-                            <DialogClose asChild><Button type="button" variant="ghost">Cancel</Button></DialogClose>
+                            <DialogClose><Button type="button" variant="ghost">Cancel</Button></DialogClose>
                             <Button type="submit" className="bg-[#00d4aa] text-black font-semibold">Add Bill</Button>
                           </DialogFooter>
                         </form>
