@@ -1,15 +1,9 @@
 import { compare, hash } from "bcryptjs";
-import NextAuth from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
-  trustHost: true,
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -64,7 +58,7 @@ export const {
   session: {
     strategy: "jwt",
   },
-});
+};
 
 export async function hashPassword(password: string) {
   return hash(password, 12);

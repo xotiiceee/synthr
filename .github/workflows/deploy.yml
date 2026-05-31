@@ -37,7 +37,6 @@ jobs:
         run: |
           tar -czf deploy.tar.gz \
             .next/standalone \
-            node_modules \
             prisma \
             package.json \
             package-lock.json \
@@ -75,10 +74,10 @@ jobs:
             tar -xzf /tmp/deploy.tar.gz
 
             echo "==> Running database migrations..."
-            npx prisma migrate deploy
+            export $(cat /opt/synthr/.env | grep -v '^#' | xargs) && npx prisma migrate deploy
 
             echo "==> Restarting app..."
-            pm2 start ecosystem.config.js 2>/dev/null || pm2 reload synthr
+            export $(cat /opt/synthr/.env | grep -v '^#' | xargs) && pm2 start ecosystem.config.js 2>/dev/null || pm2 reload synthr --update-env
 
             echo "==> Cleaning up..."
             rm /tmp/deploy.tar.gz
