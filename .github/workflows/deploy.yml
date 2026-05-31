@@ -62,7 +62,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
-            cd /var/www/synthr
+            cd /opt/synthr
 
             echo "==> Stopping app..."
             pm2 stop synthr 2>/dev/null || true
@@ -75,8 +75,7 @@ jobs:
             tar -xzf /tmp/deploy.tar.gz
 
             echo "==> Running database migrations..."
-            which prisma > /dev/null || npm install -g prisma
-            prisma migrate deploy
+            npx prisma migrate deploy
 
             echo "==> Restarting app..."
             pm2 start ecosystem.config.js 2>/dev/null || pm2 reload synthr
