@@ -38,10 +38,12 @@ export function Sidebar() {
   return (
     <aside className="hidden w-64 flex-col border-r border-border bg-card md:flex">
       <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-        <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100" height="100" rx="20" fill="#0f172a"/>
-          <path d="M20 60 Q 20 80 40 80 L 50 80 Q 70 80 70 60 Q 70 40 50 40 L 45 40 Q 35 40 35 30 Q 35 20 45 20 L 55 20 Q 75 20 75 40" 
-                stroke="#00d4aa" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <svg width="28" height="28" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="28" fill="#0f172a"/>
+          <path d="M30 38 L75 38" stroke="#00d4aa" strokeWidth="3.5" strokeLinecap="round"/>
+          <path d="M75 38 C95 38 95 60 75 60 L45 60" stroke="#00d4aa" strokeWidth="3.5" strokeLinecap="round"/>
+          <path d="M45 60 C25 60 25 82 45 82 L90 82" stroke="#00d4aa" strokeWidth="3.5" strokeLinecap="round"/>
+          <path d="M90 82 L82 76 M90 82 L82 88" stroke="#00d4aa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
         <span className="text-xl font-bold tracking-tight">synthr</span>
       </div>

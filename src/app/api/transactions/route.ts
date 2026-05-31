@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { TransactionType } from "@prisma/client";
+import { detectCategory } from "@/lib/categorize";
 
 const transactionSchema = z.object({
   type: z.nativeEnum(TransactionType),
@@ -71,6 +72,18 @@ export async function POST(req: NextRequest) {
     }
 
     const transaction = await prisma.$transaction(async (tx) => {
+      // Auto-detect category if none provided
+      let finalCategoryId = data.categoryId || undefined;
+      if (!finalCategoryId && data.type === "EXPENSE" && data.description) {
+        const detected = detectCategory(data.description);
+        if (detected) {
+          const cat = await tx.category.findFirst({
+            where: { userId: session.user.id, name: detected, type: "EXPENSE" },
+          });
+          finalCategoryId = cat?.id;
+        }
+      }
+
       const created = await tx.transaction.create({
         data: {
           type: data.type,
@@ -80,7 +93,7 @@ export async function POST(req: NextRequest) {
           notes: data.notes,
           accountId: data.accountId,
           toAccountId: data.toAccountId,
-          categoryId: data.categoryId,
+          categoryId: finalCategoryId,
           userId: session.user.id,
           tags: data.tagIds?.length
             ? {
