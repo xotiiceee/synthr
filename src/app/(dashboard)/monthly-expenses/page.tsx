@@ -245,7 +245,7 @@ export default function MonthlyExpensesPage() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-zinc-400">Account</Label>
-                    <Select onValueChange={(v: string) => setValue("accountId", v)}>
+                    <Select onValueChange={(v) => setValue("accountId", String(v || ""))}>
                       <SelectTrigger className="bg-zinc-950 border-white/10"><SelectValue placeholder="Select" /></SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10">
                         {accounts?.map((a: any) => (
