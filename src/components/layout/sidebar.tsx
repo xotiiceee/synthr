@@ -24,6 +24,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/transactions", label: "Transactions", icon: Receipt },
   { href: "/accounts", label: "Accounts", icon: Wallet },
+  { href: "/monthly-expenses", label: "Monthly", icon: Receipt },
   { href: "/budgets", label: "Budgets", icon: PiggyBank },
   { href: "/savings-advisor", label: "Savings Advisor", icon: TrendingUp },
   { href: "/investments", label: "Investments", icon: Landmark },
