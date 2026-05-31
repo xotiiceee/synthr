@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   Receipt,
+  Target,
   Wallet,
   PiggyBank,
   TrendingUp,
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/transactions", label: "Transactions", icon: Receipt },
   { href: "/accounts", label: "Accounts", icon: Wallet },
+  { href: "/budget-planner", label: "Plan", icon: Target },
   { href: "/monthly-expenses", label: "Monthly", icon: Receipt },
   { href: "/budgets", label: "Budgets", icon: PiggyBank },
   { href: "/savings-advisor", label: "Savings Advisor", icon: TrendingUp },
