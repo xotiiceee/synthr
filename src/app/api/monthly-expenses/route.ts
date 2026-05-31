@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
   for (const e of expenses) {
     const key = e.categoryId || "uncategorized";
-    const existing = categoryBreakdown.get(key) || { name: e.category?.name || "Uncategorized", total: 0, count: 0, color: e.category?.color };
+    const existing = categoryBreakdown.get(key) || { name: e.category?.name || "Uncategorized", total: 0, count: 0, color: e.category?.color || undefined };
     existing.total += Number(e.amount);
     existing.count += 1;
     categoryBreakdown.set(key, existing);
